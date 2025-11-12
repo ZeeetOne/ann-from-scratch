@@ -248,6 +248,8 @@ ann-from-scratch/
 │   └── integration/            # Integration tests
 ├── examples/                   # Usage examples
 ├── docs/                       # Documentation
+│   ├── test-reports/           # Test execution reports
+│   ├── examples/               # Code walkthroughs & tutorials
 │   ├── ARCHITECTURE.md         # Design & patterns
 │   ├── API.md                  # API reference
 │   └── TRAINING_GUIDE.md       # Training tips
@@ -384,10 +386,18 @@ python run.py --config testing
 
 ## 📚 Documentation
 
+### Core Documentation
 - **[Architecture Guide](docs/ARCHITECTURE.md)** - Design decisions, patterns, and extension points
 - **[API Reference](docs/API.md)** - Complete REST API documentation
 - **[Training Guide](docs/TRAINING_GUIDE.md)** - Best practices for training networks
-- **[Examples](examples/)** - Code examples for common tasks
+
+### Test Reports
+- **[Network Configurations Test Report](docs/test-reports/network-configurations-test-report.md)** - 20 network architecture tests
+- **[Comprehensive Test Report](docs/test-reports/comprehensive-test-report.md)** - 50 comprehensive test cases
+
+### Examples & Walkthroughs
+- **[Binary Classification Walkthrough](docs/examples/binary-classification-walkthrough.md)** - Step-by-step manual calculations
+- **[Code Examples](examples/)** - Python examples for common tasks
 
 ## 🛠️ Technologies
 
