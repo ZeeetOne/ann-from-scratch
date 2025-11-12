@@ -1,0 +1,24 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(python app.py:*)",
+      "Bash(python test_normalized_dataset.py:*)",
+      "Bash(python test_binary_fix.py:*)",
+      "Bash(python test_random_dataset.py:*)",
+      "Bash(python debug_custom_network.py:*)",
+      "Bash(python debug_wrong_connection.py:*)",
+      "Bash(python debug_predict_train.py:*)",
+      "Bash(python test_relu_network.py:*)",
+      "Bash(python debug_relu_stuck.py:*)",
+      "Bash(python debug_exact_05.py:*)",
+      "Bash(git init:*)",
+      "Bash(git add:*)",
+      "Bash(git commit:*)",
+      "Bash(del nul 2)",
+      "Bash(NUL)",
+      "Bash(.gitignore)"
+    ],
+    "deny": [],
+    "ask": []
+  }
+}
