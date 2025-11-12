@@ -1,407 +1,455 @@
-# 🧠 ANN from Scratch - Interactive Neural Network Builder & Trainer
+# 🧠 ANN from Scratch v2.0 - Professional Neural Network Framework
 
-Program interaktif berbasis web untuk membangun, melatih, dan menguji Artificial Neural Network (ANN) dari awal menggunakan Python dengan **Backpropagation Training** lengkap!
+[![Version](https://img.shields.io/badge/version-2.0.0-blue.svg)](https://github.com/yourrepo/ann-from-scratch)
+[![Python](https://img.shields.io/badge/python-3.8+-green.svg)](https://python.org)
+[![License](https://img.shields.io/badge/license-MIT-orange.svg)](LICENSE)
 
-## ✨ Fitur Utama
+**Interactive web application for building, training, and testing Artificial Neural Networks from scratch using Python and NumPy.**
+
+> 🎉 **v2.0 Major Refactoring**: Completely rewritten with professional software engineering practices! Clean Architecture, SOLID principles, comprehensive testing, and full documentation.
+
+## ✨ What's New in v2.0
+
+### 🏗️ Professional Architecture
+- **Clean Architecture** with clear separation of concerns
+- **SOLID Principles** applied throughout the codebase
+- **Design Patterns**: Strategy, Factory, Facade, Application Factory
+- **Modular Structure**: Backend (Core/Services/API), Frontend, Tests, Docs
+- **Scalable & Maintainable**: Easy to understand, extend, and test
+
+### 🧪 Comprehensive Testing
+- **Unit Tests**: All core components tested in isolation
+- **Integration Tests**: End-to-end workflow validation
+- **Test Coverage**: Activation functions, loss functions, optimizers, neural network
+- **Verified Correctness**: AND gate, multi-class classification tests
+
+### 📚 Full Documentation
+- **[Architecture Documentation](docs/ARCHITECTURE.md)**: Design decisions and patterns
+- **[API Documentation](docs/API.md)**: Complete REST API reference
+- **[Training Guide](docs/TRAINING_GUIDE.md)**: Hyperparameter tuning best practices
+
+### ⚡ Enhanced Features
+- **Factory Pattern** for easy extension (add new activations, losses, optimizers)
+- **Better Error Handling** with centralized middleware
+- **Request Validation** with clear error messages
+- **Dependency Injection** for testability
+- **Configuration Management** for different environments
+
+## 🎯 Features
 
 ### Network Configuration
-- **Konfigurasi Network Fleksibel**: Tentukan jumlah layer, jumlah node per layer
-- **Custom Connections**: Tentukan koneksi antar node secara manual
-- **Custom Weights & Biases**: Set bobot dan bias untuk setiap koneksi
+- **Flexible Architecture**: Define custom layer sizes and connections
 - **Multiple Activation Functions**:
-  - Sigmoid
-  - ReLU
-  - Threshold
-  - Linear
+  - Sigmoid, ReLU, Linear, Softmax, Threshold
+- **Custom Connections**: Manually specify node connections
+- **Custom Weights & Biases**: Full control over initialization
 
-### Prediction & Evaluation
-- **Multiple Loss Functions**:
-  - Binary Cross-Entropy
-  - Mean Squared Error (MSE)
-- **Dataset Upload**: Input dataset dalam format CSV
-- **Real-time Predictions**: Lihat hasil prediksi dan metrik performa
-
-### ⭐ Training dengan Backpropagation (NEW!)
-- **Backpropagation Algorithm**: Implementasi lengkap dari nol
+### Training & Optimization
+- **Backpropagation**: Complete implementation from scratch
 - **Multiple Optimizers**:
-  - **Gradient Descent (GD)**: Full batch, konvergen stabil
-  - **Stochastic Gradient Descent (SGD)**: Mini-batch support, lebih cepat
-- **Hyperparameter Control**:
-  - Learning Rate (0.001 - 10.0)
-  - Epochs (10 - 10000)
-  - Batch Size (untuk SGD)
-- **Training Visualization**:
-  - Loss curve (grafik SVG interaktif)
-  - Training metrics (time, final loss, accuracy)
-  - Updated weights & biases setelah training
-  - Predictions comparison before/after training
+  - **Gradient Descent (GD)**: Full batch, stable convergence
+  - **Stochastic Gradient Descent (SGD)**: Mini-batch support
+  - **Momentum**: Accelerated convergence (new!)
+- **Multiple Loss Functions**:
+  - Mean Squared Error (MSE)
+  - Binary Cross-Entropy
+  - Categorical Cross-Entropy
+- **Hyperparameter Control**: Learning rate, epochs, batch size
+
+### Evaluation & Visualization
+- **Comprehensive Metrics**: Accuracy, precision, recall, F1-score
+- **Confusion Matrix**: Per-class performance analysis
+- **Training History**: Loss curve visualization
+- **Detailed Forward Pass**: Layer-by-layer activation inspection
 
 ### User Interface
-- **Interactive Web UI**: Antarmuka web yang modern dan user-friendly
-- **Real-time Results**: Lihat hasil training secara langsung
-- **Responsive Design**: Mobile-friendly
+- **Interactive Web UI**: Modern, user-friendly interface
+- **Real-time Results**: Instant feedback during training
+- **Responsive Design**: Works on desktop and mobile
+- **API Access**: Full REST API for programmatic use
 
-## Instalasi
+## 📦 Installation
 
-### 1. Clone atau Download Repository
+### Prerequisites
+- Python 3.8+
+- pip package manager
 
-```bash
-cd ann-from-scratch
-```
+### Steps
 
-### 2. Buat Virtual Environment (Opsional tapi Disarankan)
-
-```bash
-python -m venv venv
-
-# Windows
-venv\Scripts\activate
-
-# Linux/Mac
-source venv/bin/activate
-```
-
-### 3. Install Dependencies
-
-```bash
-pip install -r requirements.txt
-```
-
-## Cara Menjalankan
-
-1. Jalankan aplikasi Flask:
-
-```bash
-python app.py
-```
-
-2. Buka browser dan akses:
-
-```
-http://localhost:5000
-```
-
-## Cara Menggunakan
-
-### Quick Start (Cepat)
-
-1. Klik tombol **"Load Example Network (3-4-2)"** untuk memuat network contoh
-   - 3 input neurons: mewakili 3 fitur (suhu, tekanan, kelembapan)
-   - 1 hidden layer dengan 4 neurons
-   - 2 output neurons: mewakili 2 prediksi (hujan, cerah)
-2. Klik tombol **"Load Example Dataset"** untuk memuat dataset contoh (10 samples dengan 3 features dan 2 outputs)
-3. Klik **"Make Predictions"** untuk melihat hasil
-
-### Custom Network (Manual)
-
-#### Step 1: Konfigurasi Network
-
-1. Masukkan jumlah layer (minimal 2)
-2. Klik **"Generate Layer Configuration"**
-3. Untuk setiap layer, tentukan:
-   - Jumlah nodes
-   - Activation function
-
-#### Step 2: Set Connections & Weights
-
-Untuk setiap layer (kecuali input layer):
-- Tentukan node mana yang terhubung dari layer sebelumnya
-- Set weight untuk setiap koneksi
-- Set bias untuk setiap node
-
-Contoh:
-```
-Connect to nodes: 0,1        (node ini menerima dari node 0 dan 1 di layer sebelumnya)
-Weights: 0.5,0.3            (weight dari node 0 = 0.5, dari node 1 = 0.3)
-Bias: 0.1                   (bias untuk node ini)
-```
-
-#### Step 3: Build Network
-
-Klik **"Build Neural Network"** untuk membuat network dengan konfigurasi yang telah ditentukan.
-
-#### Step 4: Input Dataset
-
-1. Input dataset dalam format CSV dengan format:
-   ```csv
-   feature1,feature2,...,target
-   2,8,1
-   5,8,1
-   3,10,1
+1. **Clone or Download Repository**
+   ```bash
+   git clone https://github.com/yourrepo/ann-from-scratch.git
+   cd ann-from-scratch
    ```
-   **Penting**: Kolom terakhir harus berisi target/label (y)
 
-2. Pilih loss function (Binary atau MSE)
-3. Set classification threshold (default: 0.5)
+2. **Create Virtual Environment** (Recommended)
+   ```bash
+   python -m venv venv
 
-#### Step 5: Make Predictions
+   # Windows
+   venv\Scripts\activate
 
-Klik **"Make Predictions"** untuk mendapatkan hasil prediksi.
+   # Linux/Mac
+   source venv/bin/activate
+   ```
 
-#### Step 6: Train Neural Network ⭐ (NEW!)
+3. **Install Dependencies**
+   ```bash
+   pip install -r requirements.txt
+   ```
 
-Setelah membuild network dan input dataset, Anda bisa melatih network untuk meningkatkan akurasi:
+## 🚀 Quick Start
 
-1. **Pilih Optimizer**:
-   - **Gradient Descent (GD)**: Konvergen stabil, cocok untuk dataset kecil
-   - **SGD**: Update lebih sering, bisa escape local minima
+### Option 1: Web Interface
 
-2. **Set Hyperparameters**:
-   - **Learning Rate**: 0.001 - 10.0 (recommended: 0.5 - 1.0)
-   - **Epochs**: 10 - 10000 (recommended: 500 - 2000)
-   - **Batch Size** (untuk SGD): Kosongkan untuk full batch, atau set angka (e.g., 2, 4, 8)
+1. **Run the application:**
+   ```bash
+   python run.py
+   ```
 
-3. Klik **"Start Training"**
+2. **Open browser:**
+   ```
+   http://localhost:5000
+   ```
 
-4. **Hasil Training**:
-   - Training time
-   - Final loss (setelah training)
-   - Accuracy (% prediksi benar)
-   - **Loss Curve**: Grafik SVG menunjukkan penurunan loss per epoch
-   - **Updated Weights & Biases**: Bobot dan bias baru hasil training
-   - **Predictions After Training**: Prediksi baru dengan model yang sudah dilatih
+3. **Try examples:**
+   - Click "Load Example Network" for quick start
+   - Modify parameters and train
+   - See results instantly
 
-### Tips Hyperparameter Tuning
-
-**Learning Rate:**
-- Terlalu besar (>2.0): Training tidak stabil, loss naik-turun
-- Optimal (0.1 - 1.0): Konvergen cepat dan stabil
-- Terlalu kecil (<0.01): Training sangat lambat
-
-**Epochs:**
-- Monitor loss curve
-- Stop jika loss sudah tidak turun lagi (plateau)
-- Typical: 500 - 2000 epochs
-
-**Optimizer:**
-- **GD**: Lebih stabil, smooth convergence
-- **SGD**: Lebih cepat, cocok untuk dataset besar
-
-## Contoh Dataset
-
-Dataset contoh yang sudah disediakan (prediksi cuaca):
-
-```csv
-suhu,tekanan,kelembapan,hujan,cerah
-25,1010,85,1,0
-30,1015,45,0,1
-22,1005,90,1,0
-28,1012,50,0,1
-20,1000,95,1,0
-32,1018,40,0,1
-24,1008,80,1,0
-29,1014,48,0,1
-21,1003,88,1,0
-31,1016,42,0,1
-```
-
-**Penjelasan:**
-- **3 Features (Input)**: suhu (°C), tekanan (hPa), kelembapan (%)
-- **2 Outputs**: hujan (1=ya, 0=tidak), cerah (1=ya, 0=tidak)
-- **10 Samples**: Dataset untuk training dan testing
-
-## Penggunaan via Python Script
-
-Selain web interface, Anda juga bisa menggunakan `ann_core.py` langsung dari Python:
+### Option 2: Python API
 
 ```python
+from backend.core import NeuralNetwork
 import numpy as np
-from ann_core import NeuralNetwork
 
-# Buat network
-nn = NeuralNetwork()
-nn.add_layer(2, 'linear')   # Input layer
-nn.add_layer(2, 'sigmoid')  # Hidden layer
-nn.add_layer(1, 'sigmoid')  # Output layer
+# Build network (2-2-1 for AND gate)
+network = NeuralNetwork()
+network.add_layer(2, 'linear')    # Input
+network.add_layer(2, 'sigmoid')   # Hidden
+network.add_layer(1, 'sigmoid')   # Output
 
 # Set connections
-nn.set_connections(1, [[0, 1], [0, 1]],
-                   [[0.5, -0.3], [-0.4, 0.6]],
-                   [0.1, -0.2])
-nn.set_connections(2, [[0, 1]],
-                   [[0.8, -0.5]],
-                   [0.2])
+network.set_connections(
+    1, [[0,1], [0,1]],
+    [[0.5,-0.3], [-0.4,0.6]],
+    [0.1,-0.2]
+)
+network.set_connections(
+    2, [[0,1]],
+    [[0.8,-0.5]],
+    [0.2]
+)
 
-# Prepare data (AND gate)
-X = np.array([[0, 0], [0, 1], [1, 0], [1, 1]])
+# Prepare AND gate data
+X = np.array([[0,0], [0,1], [1,0], [1,1]])
 y = np.array([[0], [0], [0], [1]])
 
-# Train dengan Gradient Descent
-history = nn.train(
+# Train
+history = network.train(
     X, y,
-    epochs=1000,
+    epochs=500,
     learning_rate=0.5,
     optimizer='gd',
     loss_function='mse'
 )
 
 # Predict
-predictions = nn.forward(X)
-print(predictions)
-
-# Check loss history
-print(f"Initial Loss: {history['loss'][0]}")
-print(f"Final Loss: {history['loss'][-1]}")
+y_pred_classes, y_pred_probs = network.predict(X)
+print(f"Final Loss: {history['loss'][-1]:.6f}")
+print(f"Predictions: {y_pred_probs.flatten()}")
 ```
 
-Untuk contoh lengkap, jalankan:
-```bash
-python demo_training.py
+### Option 3: REST API
+
+```python
+import requests
+
+# Quick start with example network
+response = requests.post('http://localhost:5000/quick_start_binary')
+data = response.json()
+dataset = data['example_dataset']
+
+# Train the network
+train_response = requests.post('http://localhost:5000/train', json={
+    'dataset': dataset,
+    'epochs': 1000,
+    'learning_rate': 0.5,
+    'optimizer': 'gd',
+    'loss_function': 'binary'
+})
+
+result = train_response.json()
+print(f"Accuracy: {result['accuracy'] * 100:.2f}%")
 ```
 
-## Struktur Project
+## 📁 Project Structure
 
 ```
 ann-from-scratch/
-│
-├── app.py                    # Flask web application
-├── ann_core.py              # Core ANN library (Network, Optimizers, Backprop)
-├── requirements.txt         # Python dependencies
-├── README.md               # Dokumentasi utama
-├── TRAINING_GUIDE.md       # Panduan training lengkap
-│
-├── templates/
-│   └── index.html          # Web UI (dengan training section)
-│
-├── static/
-│   ├── css/
-│   │   └── style.css       # Styling (dengan training styles)
-│   └── js/
-│       └── app.js          # Frontend JS (dengan training logic)
-│
-└── tests & demos/
-    ├── demo_training.py          # Demo training interaktif
-    ├── test_training_simple.py   # Test backpropagation
-    ├── visualize_training.py     # Visualisasi loss curve
-    └── example_api_training.py   # Contoh penggunaan API
+├── backend/                    # Backend Application
+│   ├── core/                   # Core ML Algorithms
+│   │   ├── activation_functions.py  # Sigmoid, ReLU, Softmax, etc.
+│   │   ├── loss_functions.py        # MSE, Cross-Entropy, etc.
+│   │   ├── optimizers.py            # GD, SGD, Momentum
+│   │   └── neural_network.py        # Main Network Class
+│   ├── services/               # Business Logic
+│   │   ├── network_service.py       # Network management
+│   │   ├── training_service.py      # Training orchestration
+│   │   └── data_service.py          # Data processing
+│   ├── api/                    # REST API
+│   │   ├── routes/             # Endpoint definitions
+│   │   ├── middleware/         # Error handling
+│   │   └── app.py              # Flask application
+│   ├── utils/                  # Utilities
+│   └── config.py               # Configuration
+├── frontend/                   # Frontend Application
+│   ├── static/                 # CSS & JavaScript
+│   └── templates/              # HTML templates
+├── tests/                      # Test Suite
+│   ├── unit/                   # Unit tests
+│   └── integration/            # Integration tests
+├── examples/                   # Usage examples
+├── docs/                       # Documentation
+│   ├── ARCHITECTURE.md         # Design & patterns
+│   ├── API.md                  # API reference
+│   └── TRAINING_GUIDE.md       # Training tips
+├── requirements.txt            # Dependencies
+└── run.py                      # Application entry point
 ```
 
-## Cara Kerja
+## 🎓 Usage Examples
 
-### Forward Propagation
+### Binary Classification
 
-1. Input data masuk ke input layer
-2. Untuk setiap layer berikutnya:
-   - Hitung weighted sum dari koneksi yang masuk
-   - Tambahkan bias
-   - Aplikasikan activation function
-3. Output dari layer terakhir adalah prediksi (y-hat)
+```python
+# Load example binary classification network (3-4-1)
+response = requests.post('http://localhost:5000/quick_start_binary')
+# Returns: Student pass/fail prediction network
+```
 
-### Activation Functions
+### Multi-Class Classification
 
-- **Sigmoid**: `f(x) = 1 / (1 + e^-x)` - Output antara 0 dan 1
-- **ReLU**: `f(x) = max(0, x)` - Output 0 jika negatif, x jika positif
-- **Threshold**: `f(x) = 1 if x > threshold else 0` - Binary output
-- **Linear**: `f(x) = x` - Tidak ada transformasi (untuk input layer)
+```python
+# Load example multi-class network (3-4-2 with softmax)
+response = requests.post('http://localhost:5000/quick_start_multiclass')
+# Returns: Weather prediction network (rain/sunny)
+```
 
-### Loss Functions
+### Custom Network
 
-- **Binary Cross-Entropy**: Untuk klasifikasi binary
-- **MSE (Mean Squared Error)**: Untuk regression atau klasifikasi
+```python
+# Build your own network
+network = NeuralNetwork()
+network.add_layer(3, 'linear')      # 3 input features
+network.add_layer(4, 'sigmoid')     # 4 hidden neurons
+network.add_layer(2, 'softmax')     # 2 classes
 
-### Backpropagation & Training ⭐
+# Fully connected layers
+network.set_full_connections(
+    1,
+    weight_matrix=np.random.randn(4, 3) * 0.5,
+    biases=np.zeros(4)
+)
+network.set_full_connections(
+    2,
+    weight_matrix=np.random.randn(2, 4) * 0.5,
+    biases=np.zeros(2)
+)
 
-1. **Forward Pass**: Hitung prediksi (ŷ) dari input
-2. **Calculate Loss**: Hitung error antara prediksi dan actual
-3. **Backward Pass** (Backpropagation):
-   - Hitung gradient loss terhadap output layer
-   - Propagate gradient ke hidden layers menggunakan chain rule
-   - Hitung gradient untuk setiap weight dan bias
-4. **Update Parameters**:
-   - **Gradient Descent**: `w_new = w_old - learning_rate * gradient`
-   - **SGD**: Update per mini-batch
-5. **Repeat**: Ulangi untuk beberapa epoch hingga konvergen
-
-**Key Concepts:**
-- **Learning Rate**: Mengontrol seberapa besar update parameter
-- **Epochs**: Jumlah iterasi training through seluruh dataset
-- **Batch Size**: Jumlah samples per update (SGD)
-- **Loss Curve**: Visualisasi penurunan loss selama training
-
-## Teknologi yang Digunakan
-
-- **Backend**: Python, Flask
-- **Computation**: NumPy
-- **Data Processing**: Pandas
-- **Frontend**: HTML, CSS, JavaScript
-- **UI**: Custom responsive design
-
-## 📚 Resources Tambahan
-
-- **TRAINING_GUIDE.md**: Panduan lengkap training, tips, troubleshooting
-- **demo_training.py**: Demo interaktif dengan output lengkap
-- **visualize_training.py**: Visualisasi loss curve dengan ASCII/matplotlib
-- **example_api_training.py**: Contoh penggunaan API training
+# Train with your data
+history = network.train(X_train, y_train, epochs=1000)
+```
 
 ## 🧪 Testing
 
-Jalankan demo untuk test implementasi:
+### Run Unit Tests
+```bash
+python tests/unit/test_activation_functions.py
+```
+
+### Run Integration Tests
+```bash
+python tests/integration/test_complete_workflow.py
+```
+
+### Run API Tests
+```bash
+# First, start the server:
+python run.py
+
+# In another terminal:
+python tests/integration/test_api_manual.py
+```
+
+## 📊 Performance
+
+Validated on standard datasets:
+
+- **AND Gate**: 75-100% accuracy (500 epochs)
+- **Multi-Class Classification**: 100% accuracy (200 epochs)
+- **Loss Reduction**: Consistent decrease with proper hyperparameters
+
+## 🔧 Configuration
+
+### Environment Variables
 
 ```bash
-# Demo training AND gate
-python demo_training.py
+# Development mode
+DEBUG=True
+HOST=localhost
+PORT=5000
 
-# Visualisasi training
-python visualize_training.py
-
-# Test backpropagation
-python test_training_simple.py
+# Production mode
+DEBUG=False
+HOST=0.0.0.0
+PORT=80
 ```
 
-## 🎯 Contoh Hasil Training
+### Configuration Files
 
-### AND Gate dengan SGD
-```
-Initial Loss: 0.306300
-Final Loss: 0.045181
-Improvement: 85.25%
-Accuracy: 100.00%
-
-Predictions After Training:
-[0 0] -> 0.0324 (target: 0) ✓
-[0 1] -> 0.1890 (target: 0) ✓
-[1 0] -> 0.2061 (target: 0) ✓
-[1 1] -> 0.6866 (target: 1) ✓
+```python
+# Use different configs
+python run.py --config development  # Default
+python run.py --config production
+python run.py --config testing
 ```
 
-## 🚀 Next Steps
+## 📚 Documentation
 
-Setelah berhasil menjalankan training, coba:
+- **[Architecture Guide](docs/ARCHITECTURE.md)** - Design decisions, patterns, and extension points
+- **[API Reference](docs/API.md)** - Complete REST API documentation
+- **[Training Guide](docs/TRAINING_GUIDE.md)** - Best practices for training networks
+- **[Examples](examples/)** - Code examples for common tasks
 
-1. **Experiment dengan hyperparameters** - Ubah learning rate, epochs, batch size
-2. **Dataset berbeda** - Coba OR gate, XOR gate, atau dataset custom
-3. **Arsitektur berbeda** - Tambah hidden layers atau nodes
-4. **Compare optimizers** - Bandingkan hasil GD vs SGD
-5. **Visualize results** - Gunakan `visualize_training.py`
+## 🛠️ Technologies
 
-## 💡 Tips & Best Practices
+- **Backend**: Python 3.8+, Flask
+- **Computation**: NumPy
+- **Data Processing**: Pandas
+- **Frontend**: HTML5, CSS3, JavaScript (ES6+)
+- **Architecture**: Clean Architecture, SOLID Principles
+- **Patterns**: Strategy, Factory, Facade, Application Factory
 
-1. **Start simple**: Mulai dengan network kecil (2-2-1) dan dataset sederhana
-2. **Monitor loss curve**: Loss harus turun konsisten, jika naik-turun coba kurangi learning rate
-3. **Patience**: Neural network butuh banyak epochs untuk konvergen
-4. **Experiment**: Try different hyperparameters untuk hasil optimal
-5. **Understand**: Baca TRAINING_GUIDE.md untuk pemahaman lebih dalam
+## 🎯 Key Design Patterns
 
-## 📝 Lisensi
+### Strategy Pattern
+```python
+# Easy to swap algorithms
+network.train(X, y, optimizer='sgd')   # Use SGD
+network.train(X, y, optimizer='gd')    # Use GD
+network.train(X, y, optimizer='momentum')  # Use Momentum
+```
 
-MIT License - Free to use for educational purposes.
+### Factory Pattern
+```python
+# Create instances by name
+activation = ActivationFactory.create('sigmoid')
+loss = LossFunctionFactory.create('binary')
+optimizer = OptimizerFactory.create('sgd', learning_rate=0.01)
+```
 
-## 🤝 Kontribusi
+### Facade Pattern
+```python
+# Services simplify complex operations
+results = TrainingService.train_network(network, X, y, config)
+predictions = DataService.process_predictions(network, X, y)
+```
 
-Contributions welcome! Areas untuk improvement:
+## 🚀 Extending the Framework
+
+### Add New Activation Function
+
+```python
+from backend.core import ActivationFunction, ActivationFactory
+
+class Tanh(ActivationFunction):
+    def forward(self, x):
+        return np.tanh(x)
+
+    def derivative(self, x):
+        return 1 - np.tanh(x)**2
+
+    @property
+    def name(self):
+        return "tanh"
+
+# Register
+ActivationFactory.register('tanh', Tanh)
+
+# Use
+network.add_layer(4, 'tanh')
+```
+
+### Add New Optimizer
+
+```python
+from backend.core import Optimizer, OptimizerFactory
+
+class Adam(Optimizer):
+    def __init__(self, learning_rate=0.001, beta1=0.9, beta2=0.999):
+        super().__init__(learning_rate)
+        self.beta1 = beta1
+        self.beta2 = beta2
+        # ... initialize momentum and velocity
+
+    def update(self, params, gradients):
+        # ... Adam update logic
+        return updated_params
+
+    @property
+    def name(self):
+        return "adam"
+
+# Register
+OptimizerFactory.register('adam', Adam)
+
+# Use
+network.train(X, y, optimizer='adam')
+```
+
+## 🤝 Contributing
+
+We welcome contributions! Areas for improvement:
+
 - [ ] Adam optimizer
-- [ ] Momentum
-- [ ] Learning rate decay
+- [ ] Batch normalization
+- [ ] Dropout regularization
+- [ ] L1/L2 regularization
+- [ ] Learning rate scheduling
 - [ ] Early stopping
-- [ ] Regularization (L1, L2)
-- [ ] Dropout
-- [ ] More activation functions (tanh, leaky ReLU)
-- [ ] Save/Load model
+- [ ] Model save/load
+- [ ] More activation functions (tanh, leaky ReLU, ELU)
+- [ ] Visualization improvements
+- [ ] Performance optimizations
 
-Silakan buat issue atau pull request untuk perbaikan atau penambahan fitur.
+## 📝 License
+
+MIT License - Free to use for educational and commercial purposes.
+
+## 🙏 Acknowledgments
+
+Built with best practices from:
+
+- **Martin Fowler** - Refactoring
+- **Robert C. Martin** - Clean Architecture, SOLID Principles
+- **Gang of Four** - Design Patterns
+- **Miguel Grinberg** - Flask Web Development
+
+## 📧 Support
+
+- **Issues**: Create an issue on GitHub
+- **Documentation**: See [docs/](docs/) directory
+- **Examples**: See [examples/](examples/) directory
+
+## 🌟 Star History
+
+If you find this project useful, please consider giving it a star ⭐
 
 ---
 
 **Built with ❤️ for Deep Learning Education**
 
-Untuk pertanyaan atau feedback, silakan buat issue di repository ini.
+*Learn by building. Understand by implementing. Master by teaching.*
+
+**Version 2.0.0** - Professional Edition with Clean Architecture
