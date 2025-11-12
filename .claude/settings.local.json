@@ -6,7 +6,8 @@
       "Bash(copy TRAINING_GUIDE.md docsTRAINING_GUIDE.md)",
       "Bash(powershell -Command:*)",
       "Bash(git add:*)",
-      "Bash(git commit:*)"
+      "Bash(git commit:*)",
+      "Bash(dir:*)"
     ],
     "deny": [],
     "ask": []
