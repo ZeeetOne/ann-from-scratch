@@ -69,11 +69,12 @@ def train():
         # Get updated weights and biases
         updated_params = DataProcessor.extract_weights_and_biases(network)
 
-        # Format predictions
+        # Format predictions - get fresh predictions as numpy arrays
+        y_pred_classes, y_pred_probs = network.predict(X)
         predictions = DataService.format_training_predictions(
             y,
-            network.forward(X),
-            results['predictions']['classes']
+            y_pred_probs,
+            y_pred_classes
         )
 
         return jsonify(DataProcessor.format_response(

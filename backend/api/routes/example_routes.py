@@ -6,7 +6,7 @@ API endpoints for quick start examples.
 Author: ANN from Scratch Team
 """
 
-from flask import Blueprint, jsonify, current_app
+from flask import Blueprint, jsonify, current_app, request
 from ...services import NetworkService
 from ...utils.data_processor import DataProcessor
 
@@ -93,6 +93,58 @@ def quick_start_binary():
                 ],
                 'connections': connections_data,
                 'network_info': network_info
+            }
+        ))
+
+    except Exception as e:
+        return jsonify(DataProcessor.format_response(
+            success=False,
+            error=str(e)
+        )), 400
+
+
+@example_bp.route('/generate_random_dataset', methods=['POST'])
+def generate_random_dataset():
+    """
+    Generate random dataset matching current network architecture
+
+    Request JSON:
+        {
+            "num_samples": 10  // optional, default 10
+        }
+
+    Returns:
+        JSON response with random dataset
+    """
+    try:
+        # Get current network
+        if not hasattr(current_app, 'current_network') or current_app.current_network is None:
+            raise ValueError('No network has been built. Please build a network first.')
+
+        network = current_app.current_network
+        data = request.json or {}
+
+        # Get parameters
+        num_samples = int(data.get('num_samples', 10))
+
+        if num_samples < 1 or num_samples > 1000:
+            raise ValueError('num_samples must be between 1 and 1000')
+
+        # Generate random dataset (always truly random, no seed)
+        dataset = NetworkService.generate_random_dataset(network, num_samples, seed=None)
+
+        # Get network info
+        network_info = NetworkService.get_network_info(network)
+
+        return jsonify(DataProcessor.format_response(
+            success=True,
+            data={
+                'message': f'Generated {num_samples} random samples',
+                'dataset': dataset,
+                'num_samples': num_samples,
+                'num_inputs': network.layers[0],
+                'num_outputs': network.layers[-1],
+                'classification_type': network_info['classification_type']
             }
         ))
 

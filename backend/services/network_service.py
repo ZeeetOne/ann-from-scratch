@@ -263,3 +263,90 @@ class NetworkService:
                 })
 
         return connection_data
+
+    @staticmethod
+    def generate_random_dataset(
+        network: NeuralNetwork,
+        num_samples: int = 10,
+        seed: Optional[int] = None
+    ) -> str:
+        """
+        Generate random dataset matching network architecture
+
+        Args:
+            network: NeuralNetwork instance
+            num_samples: Number of samples to generate
+            seed: Random seed for reproducibility (None for truly random)
+
+        Returns:
+            CSV string with random dataset
+        """
+        if seed is None:
+            # Use current timestamp for truly random data
+            seed = int(np.random.randint(0, 1000000))
+
+        np.random.seed(seed)
+
+        n_inputs = network.layers[0]
+        n_outputs = network.layers[-1]
+        classification_type = network.get_classification_type()
+
+        # Generate random features (normalized to [0, 1])
+        X = np.random.rand(num_samples, n_inputs)
+
+        # Generate labels based on classification type
+        if classification_type == 'binary':
+            # Binary classification: threshold based on sum of features
+            threshold = n_inputs * 0.5
+            y = (X.sum(axis=1) > threshold).astype(int).reshape(-1, 1)
+        elif classification_type == 'multi-class':
+            # Multi-class: divide feature space into regions
+            feature_sum = X.sum(axis=1)
+            max_sum = n_inputs
+            y_labels = np.zeros(num_samples, dtype=int)
+
+            # Divide into n_outputs classes based on feature sum
+            for i in range(n_outputs):
+                lower = (i / n_outputs) * max_sum
+                upper = ((i + 1) / n_outputs) * max_sum
+                mask = (feature_sum >= lower) & (feature_sum < upper)
+                y_labels[mask] = i
+
+            # Handle edge case for maximum value
+            y_labels[feature_sum >= max_sum * (n_outputs - 1) / n_outputs] = n_outputs - 1
+
+            # Convert to one-hot encoding
+            y = np.zeros((num_samples, n_outputs))
+            y[np.arange(num_samples), y_labels] = 1
+        elif classification_type == 'multi-label':
+            # Multi-label: independent binary for each label
+            y = np.zeros((num_samples, n_outputs))
+            for i in range(n_outputs):
+                # Each label has its own threshold
+                threshold = 0.5 + (i * 0.1)
+                y[:, i] = (X[:, i % n_inputs] > threshold).astype(int)
+        else:
+            # Regression or unknown: use linear combination
+            y = X.mean(axis=1, keepdims=True)
+
+        # Create CSV string
+        dataset_lines = []
+
+        # Header
+        header = ','.join([f'x{i+1}' for i in range(n_inputs)])
+        if n_outputs > 1:
+            header += ',' + ','.join([f'y{i+1}' for i in range(n_outputs)])
+        else:
+            header += ',y1'
+        dataset_lines.append(header)
+
+        # Data rows
+        for i in range(num_samples):
+            row = ','.join([f'{x:.6f}' for x in X[i]])
+            if n_outputs > 1:
+                row += ',' + ','.join([str(int(y[i][j])) for j in range(n_outputs)])
+            else:
+                row += ',' + str(int(y[i][0]))
+            dataset_lines.append(row)
+
+        return '\n'.join(dataset_lines)
