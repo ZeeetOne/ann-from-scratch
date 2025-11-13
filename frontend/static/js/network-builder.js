@@ -175,22 +175,31 @@ class InteractiveNetworkBuilder {
             if (layer.type !== 'hidden') return;
 
             const div = document.createElement('div');
-            div.className = 'hidden-layer-item';
+            div.className = 'hidden-layer-item space-y-3 mb-3';
             div.dataset.layerIndex = index;
 
             const hiddenIndex = this.layers.slice(0, index).filter(l => l.type === 'hidden').length + 1;
 
+            // Use Tailwind/DaisyUI classes for new structure
             div.innerHTML = `
-                <div class="hidden-layer-header">
-                    <span class="layer-label">Layer ${hiddenIndex}:</span>
-                    <div class="node-counter">
-                        <button class="btn-counter hidden-minus" data-layer="${index}">−</button>
-                        <span class="hidden-count" data-layer="${index}">${layer.nodes}</span>
-                        <button class="btn-counter hidden-plus" data-layer="${index}">+</button>
-                    </div>
-                    <button class="btn-remove-layer" data-layer="${index}">✕</button>
+                <div class="flex items-center justify-between mb-2">
+                    <span class="text-sm font-semibold">Layer ${hiddenIndex}:</span>
+                    <button class="btn btn-circle btn-xs btn-error btn-remove-layer" data-layer="${index}">
+                        <i class="fas fa-times"></i>
+                    </button>
                 </div>
-                <select class="activation-select-mini hidden-activation" data-layer="${index}">
+                <div class="flex items-center justify-center gap-2 mb-2">
+                    <button class="btn btn-circle btn-sm btn-outline hidden-minus" data-layer="${index}">
+                        <i class="fas fa-minus"></i>
+                    </button>
+                    <div class="badge badge-lg badge-secondary text-xl font-bold px-4">
+                        <span class="hidden-count" data-layer="${index}">${layer.nodes}</span>
+                    </div>
+                    <button class="btn btn-circle btn-sm btn-outline hidden-plus" data-layer="${index}">
+                        <i class="fas fa-plus"></i>
+                    </button>
+                </div>
+                <select class="select select-bordered select-sm w-full hidden-activation" data-layer="${index}">
                     <option value="sigmoid" ${layer.activation === 'sigmoid' ? 'selected' : ''}>Sigmoid</option>
                     <option value="relu" ${layer.activation === 'relu' ? 'selected' : ''}>ReLU</option>
                     <option value="threshold" ${layer.activation === 'threshold' ? 'selected' : ''}>Threshold</option>
