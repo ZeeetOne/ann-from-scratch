@@ -10,7 +10,8 @@
       "Bash(dir:*)",
       "Bash(Select-String -Pattern \"TEST:|Accuracy:|OK|FAILED|passed\")",
       "Bash(timeout 300 python -m unittest:*)",
-      "Bash(timeout 30 python:*)"
+      "Bash(timeout 30 python:*)",
+      "Bash(timeout 120 python:*)"
     ],
     "deny": [],
     "ask": []
