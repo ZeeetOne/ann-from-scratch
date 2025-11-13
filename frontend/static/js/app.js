@@ -38,7 +38,10 @@ loadExampleBtn.addEventListener('click', loadExampleDataset);
 forwardPassBtn.addEventListener('click', runForwardPass);
 calculateLossBtn.addEventListener('click', calculateLoss);
 // backpropBtn.addEventListener('click', runBackpropagation);  // Removed section
-updateWeightsBtn.addEventListener('click', updateWeights);
+if (updateWeightsBtn) {
+    updateWeightsBtn.addEventListener('click', updateWeights);
+}
+document.getElementById('run1EpochBtn').addEventListener('click', run1Epoch);
 trainBtn.addEventListener('click', startTraining);
 
 // Dataset drag & drop
@@ -315,6 +318,9 @@ async function buildNetwork() {
 
             // Update dataset requirement display
             updateDatasetRequirement();
+
+            // Update progress to step 1
+            updateStep(1);
         } else {
             showError('Error building network: ' + data.error);
         }
@@ -366,6 +372,11 @@ async function quickStartMultiClass() {
                 datasetInput.value = data.example_dataset;
                 validateDataset();
                 showSuccess('Multi-class example network and dataset loaded!');
+                // Update progress to step 2 (network + dataset loaded)
+                updateStep(2);
+            } else {
+                // Only network loaded
+                updateStep(1);
             }
         } else {
             showError('Error: ' + data.error);
@@ -375,7 +386,7 @@ async function quickStartMultiClass() {
         showError('Error: ' + error.message);
     } finally {
         quickStartMultiClassBtn.disabled = false;
-        quickStartMultiClassBtn.innerHTML = '📊 Multi-Class Example (3-4-2 Softmax)';
+        quickStartMultiClassBtn.innerHTML = '<i class="fas fa-layer-group"></i> Multi-Class (3-4-2 Softmax)';
     }
 }
 
@@ -418,6 +429,11 @@ async function quickStartBinary() {
                 datasetInput.value = data.example_dataset;
                 validateDataset();
                 showSuccess('Binary example network and dataset loaded!');
+                // Update progress to step 2 (network + dataset loaded)
+                updateStep(2);
+            } else {
+                // Only network loaded
+                updateStep(1);
             }
         } else {
             showError('Error: ' + data.error);
@@ -427,7 +443,7 @@ async function quickStartBinary() {
         showError('Error: ' + error.message);
     } finally {
         quickStartBinaryBtn.disabled = false;
-        quickStartBinaryBtn.innerHTML = '🎯 Binary Example (3-4-1 Sigmoid)';
+        quickStartBinaryBtn.innerHTML = '<i class="fas fa-circle-dot"></i> Binary Classification (3-4-1)';
     }
 }
 
@@ -673,6 +689,9 @@ async function runForwardPass() {
             displayForwardPassSummary(null, data);
             displayForwardPass(null, data);
             showSuccess(`Forward pass completed! ${data.num_samples} samples analyzed.`);
+
+            // Update progress to step 3
+            updateStep(3);
         } else {
             showError('Error: ' + data.error);
         }
@@ -825,6 +844,9 @@ async function calculateLoss() {
         if (data.success) {
             displayLoss(data);
             showSuccess('Loss calculated successfully!');
+
+            // Update progress to step 4
+            updateStep(4);
         } else {
             showError('Error calculating loss: ' + data.error);
         }
@@ -951,6 +973,9 @@ async function updateWeights() {
         if (data.success) {
             displayUpdateWeights(data);
             showSuccess('Weights updated successfully! (1 epoch completed)');
+
+            // Update progress to step 5
+            updateStep(5);
         } else {
             showError('Error updating weights: ' + data.error);
         }
@@ -1083,6 +1108,160 @@ function displayUpdateWeights(data) {
     updateWeightsContainer.innerHTML = html;
 }
 
+// ============================
+// Run 1 Epoch (Forward + Loss + Update)
+// ============================
+
+async function run1Epoch() {
+    try {
+        const dataset = datasetInput.value.trim();
+
+        if (!dataset) {
+            showError('Please enter a dataset');
+            return;
+        }
+
+        // Validate dataset first
+        const validation = validateDataset();
+        if (!validation.valid) {
+            showError('Please fix dataset validation errors first');
+            return;
+        }
+
+        const lossFunction = lossFunctionSelect.value;
+        const optimizer = document.getElementById('optimizer').value;
+        const learningRate = parseFloat(document.getElementById('learningRate').value);
+
+        // Validation
+        if (learningRate <= 0 || learningRate > 10) {
+            showError('Learning rate must be between 0 and 10');
+            return;
+        }
+
+        const run1EpochBtn = document.getElementById('run1EpochBtn');
+        run1EpochBtn.disabled = true;
+        run1EpochBtn.innerHTML = '<span class="loading loading-spinner loading-sm"></span> Running 1 Epoch...';
+
+        showToast('Starting 1 Epoch: Forward Pass → Calculate Loss → Update Weights', 'info');
+
+        const response = await fetch('/update_weights', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({
+                dataset: dataset,
+                loss_function: lossFunction,
+                optimizer: optimizer,
+                learning_rate: learningRate
+            })
+        });
+
+        const data = await response.json();
+
+        if (data.success) {
+            // Display results with emphasis on 1 epoch completion
+            display1EpochResults(data);
+            showSuccess('✅ 1 Epoch Completed! (Forward Pass → Loss Calculation → Weight Update)');
+
+            // Update progress to step 5
+            updateStep(5);
+        } else {
+            showError('Error during 1 epoch: ' + data.error);
+        }
+
+    } catch (error) {
+        showError('Error: ' + error.message);
+    } finally {
+        const run1EpochBtn = document.getElementById('run1EpochBtn');
+        run1EpochBtn.disabled = false;
+        run1EpochBtn.innerHTML = '<i class="fas fa-sync-alt"></i> Run 1 Epoch';
+    }
+}
+
+// Display 1 Epoch Results
+function display1EpochResults(data) {
+    const { optimizer, learning_rate, loss_before, loss_after, loss_reduction } = data;
+
+    let html = '<div class="card bg-base-100 shadow-xl mt-6">';
+    html += '<div class="card-body">';
+
+    // Header
+    html += '<div class="flex items-center gap-3 mb-4">';
+    html += '<div class="badge badge-success badge-lg gap-2">';
+    html += '<i class="fas fa-check-circle"></i> 1 EPOCH COMPLETED';
+    html += '</div>';
+    html += '</div>';
+
+    // Explanation
+    html += '<div class="alert alert-info mb-4">';
+    html += '<i class="fas fa-info-circle"></i>';
+    html += '<div>';
+    html += '<p class="font-bold">What happened in this epoch:</p>';
+    html += '<ol class="list-decimal list-inside text-sm mt-2 space-y-1">';
+    html += '<li><strong>Forward Pass:</strong> Network made predictions on all samples</li>';
+    html += '<li><strong>Loss Calculation:</strong> Measured prediction error</li>';
+    html += '<li><strong>Backpropagation:</strong> Calculated gradients</li>';
+    html += '<li><strong>Weight Update:</strong> Adjusted weights to reduce loss</li>';
+    html += '</ol>';
+    html += '</div>';
+    html += '</div>';
+
+    // Metrics
+    html += '<div class="stats stats-vertical lg:stats-horizontal shadow w-full">';
+    html += `<div class="stat">
+        <div class="stat-title">Optimizer</div>
+        <div class="stat-value text-lg">${optimizer.toUpperCase()}</div>
+        <div class="stat-desc">Learning Rate: ${learning_rate}</div>
+    </div>`;
+    html += `<div class="stat">
+        <div class="stat-title">Loss Before</div>
+        <div class="stat-value text-error text-lg">${loss_before.toFixed(6)}</div>
+    </div>`;
+    html += `<div class="stat">
+        <div class="stat-title">Loss After</div>
+        <div class="stat-value text-success text-lg">${loss_after.toFixed(6)}</div>
+    </div>`;
+    html += `<div class="stat">
+        <div class="stat-title">Improvement</div>
+        <div class="stat-value text-success text-lg">↓ ${((loss_reduction / loss_before) * 100).toFixed(2)}%</div>
+        <div class="stat-desc">${loss_reduction.toFixed(6)} reduction</div>
+    </div>`;
+    html += '</div>';
+
+    // Next step guide
+    html += '<div class="alert alert-success mt-4">';
+    html += '<i class="fas fa-lightbulb"></i>';
+    html += '<div>';
+    html += '<p class="font-bold">Next Steps:</p>';
+    html += '<ul class="text-sm mt-2 space-y-1">';
+    html += '<li>• Run more epochs by clicking "Run 1 Epoch" again to see incremental improvements</li>';
+    html += '<li>• Or use "Start Automated Training" to run many epochs automatically</li>';
+    html += '</ul>';
+    html += '</div>';
+    html += '</div>';
+
+    html += '</div>';
+    html += '</div>';
+
+    // Insert before training progress section
+    const trainSection = document.querySelector('#train');
+    const existingResults = trainSection.querySelector('.epoch-results');
+    if (existingResults) {
+        existingResults.remove();
+    }
+
+    const resultsDiv = document.createElement('div');
+    resultsDiv.className = 'epoch-results';
+    resultsDiv.innerHTML = html;
+
+    const trainingProgress = document.getElementById('trainingProgress');
+    trainSection.insertBefore(resultsDiv, trainingProgress);
+
+    // Scroll to results
+    resultsDiv.scrollIntoView({ behavior: 'smooth', block: 'start' });
+}
+
 // NOTE: makePredictions and displayResults functions are commented out
 // because "Prediction Results" section was removed from UI
 // These functions are kept for potential future use
@@ -1131,31 +1310,21 @@ function displayClassificationInfo(classificationType, recommendedLoss) {
 
 // Helper Functions
 function showError(message) {
-    const existingError = document.querySelector('.error-message');
-    if (existingError) existingError.remove();
-
-    const errorDiv = document.createElement('div');
-    errorDiv.className = 'error-message';
-    errorDiv.textContent = message;
-
-    const section = document.querySelector('.config-section');
-    section.appendChild(errorDiv);
-
-    setTimeout(() => errorDiv.remove(), 5000);
+    // Use the toast notification system from scripts.html
+    if (typeof showToast === 'function') {
+        showToast(message, 'error');
+    } else {
+        console.error(message);
+    }
 }
 
 function showSuccess(message) {
-    const existingSuccess = document.querySelector('.success-message');
-    if (existingSuccess) existingSuccess.remove();
-
-    const successDiv = document.createElement('div');
-    successDiv.className = 'success-message';
-    successDiv.textContent = message;
-
-    const section = document.querySelector('.config-section');
-    section.appendChild(successDiv);
-
-    setTimeout(() => successDiv.remove(), 3000);
+    // Use the toast notification system from scripts.html
+    if (typeof showToast === 'function') {
+        showToast(message, 'success');
+    } else {
+        console.log(message);
+    }
 }
 
 // Train Neural Network
@@ -1222,7 +1391,24 @@ async function startTraining() {
                 displayModelEvaluation(data.evaluation);
             }
 
+            // Update charts with training history
+            if (data.history && typeof updateCharts === 'function') {
+                updateCharts(data.history);
+            }
+
             showSuccess('Training completed successfully!');
+
+            // Update progress to step 6
+            updateStep(6);
+
+            // Automatically switch to Results tab after 1 second
+            setTimeout(() => {
+                const resultsTab = document.getElementById('tab-results');
+                if (resultsTab) {
+                    resultsTab.checked = true;
+                    updateStep(7);
+                }
+            }, 1000);
         } else {
             showError('Error during training: ' + data.error);
             if (data.traceback) {

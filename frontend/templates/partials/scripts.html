@@ -14,6 +14,42 @@
         localStorage.setItem('theme', theme);
     });
 
+    // Tab Navigation Handler
+    document.addEventListener('DOMContentLoaded', () => {
+        // Map hash to tab IDs
+        const tabMap = {
+            '#build': 'tab-build',
+            '#dataset': 'tab-dataset',
+            '#train': 'tab-train',
+            '#results': 'tab-results'
+        };
+
+        // Get all navbar links
+        const navLinks = document.querySelectorAll('a[href^="#"]');
+
+        navLinks.forEach(link => {
+            link.addEventListener('click', (e) => {
+                const hash = link.getAttribute('href');
+                const tabId = tabMap[hash];
+
+                if (tabId) {
+                    e.preventDefault();
+                    const tabRadio = document.getElementById(tabId);
+                    if (tabRadio) {
+                        tabRadio.checked = true;
+                        // Scroll to top of tab content
+                        setTimeout(() => {
+                            const tabContent = tabRadio.nextElementSibling;
+                            if (tabContent) {
+                                tabContent.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                            }
+                        }, 100);
+                    }
+                }
+            });
+        });
+    });
+
     // Toast Notification Function
     function showToast(message, type = 'info') {
         const toastContainer = document.getElementById('toastContainer');
@@ -43,13 +79,49 @@
 
     // Update step progress
     function updateStep(stepNumber) {
-        for (let i = 1; i <= 6; i++) {
+        for (let i = 1; i <= 7; i++) {
             const step = document.getElementById(`step${i}`);
             if (i <= stepNumber) {
                 step.classList.add('step-primary');
             } else {
                 step.classList.remove('step-primary');
             }
+        }
+
+        // Update step description
+        updateStepDescription(stepNumber);
+
+        // Show toast for step completion
+        const stepMessages = {
+            1: '✅ Step 1 Complete: Network architecture built!',
+            2: '✅ Step 2 Complete: Dataset loaded!',
+            3: '✅ Step 3 Complete: Forward pass executed!',
+            4: '✅ Step 4 Complete: Loss calculated!',
+            5: '✅ Step 5 Complete: Weights updated (1 epoch)!',
+            6: '✅ Step 6 Complete: Training finished!',
+            7: '✅ Step 7 Complete: View your results!'
+        };
+
+        if (stepMessages[stepNumber]) {
+            showToast(stepMessages[stepNumber], 'success');
+        }
+    }
+
+    // Update step description text
+    function updateStepDescription(stepNumber) {
+        const descriptions = {
+            1: 'Next: Load or generate a dataset that matches your network architecture.',
+            2: 'Next: You can manually run Forward Pass and Calculate Loss to understand the process, or skip directly to "Run 1 Epoch".',
+            3: 'Next: Calculate the loss to measure how far off the predictions are.',
+            4: 'Next: Click "Run 1 Epoch" to complete one full training cycle (Forward Pass → Loss → Update Weights).',
+            5: 'Great! You completed 1 epoch. Run it again for more improvement, or use "Start Automated Training" for many epochs.',
+            6: 'Next: View detailed training results, loss curves, and model evaluation metrics in the Results tab.',
+            7: 'All done! Analyze your results and experiment with different architectures or hyperparameters.'
+        };
+
+        const descText = document.getElementById('stepDescriptionText');
+        if (descText && descriptions[stepNumber]) {
+            descText.textContent = descriptions[stepNumber];
         }
     }
 

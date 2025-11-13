@@ -78,6 +78,16 @@ class InteractiveNetworkBuilder {
             this.reset();
         });
 
+        // Input and Output activation changes
+        document.getElementById('inputActivation').addEventListener('change', (e) => {
+            this.layers[0].activation = e.target.value;
+        });
+
+        document.getElementById('outputActivation').addEventListener('change', (e) => {
+            const lastIndex = this.layers.length - 1;
+            this.layers[lastIndex].activation = e.target.value;
+        });
+
         // Canvas mouse events for drag-to-connect
         this.canvas.addEventListener('mousedown', this.handleMouseDown.bind(this));
         this.canvas.addEventListener('mousemove', this.handleMouseMove.bind(this));
@@ -600,6 +610,17 @@ class InteractiveNetworkBuilder {
         // Update UI
         document.getElementById('inputLayerCount').textContent = this.layers[0].nodes;
         document.getElementById('outputLayerCount').textContent = this.layers[this.layers.length - 1].nodes;
+
+        // Update activation dropdowns
+        const inputActivation = document.getElementById('inputActivation');
+        const outputActivation = document.getElementById('outputActivation');
+        if (inputActivation) {
+            inputActivation.value = this.layers[0].activation;
+        }
+        if (outputActivation) {
+            outputActivation.value = this.layers[this.layers.length - 1].activation;
+        }
+
         this.updateHiddenLayersUI();
 
         // Load connections

@@ -1,8 +1,40 @@
-<ul class="steps steps-vertical lg:steps-horizontal w-full mb-8 bg-base-100 p-6 rounded-box shadow-lg">
-    <li class="step step-primary" data-content="1" id="step1">Build Network</li>
-    <li class="step" data-content="2" id="step2">Input Dataset</li>
-    <li class="step" data-content="3" id="step3">Forward Pass</li>
-    <li class="step" data-content="4" id="step4">Calculate Loss</li>
-    <li class="step" data-content="5" id="step5">Train Model</li>
-    <li class="step" data-content="6" id="step6">View Results</li>
-</ul>
+<div class="bg-base-100 p-6 rounded-box shadow-lg mb-8">
+    <h3 class="text-lg font-bold mb-4 text-center">
+        <i class="fas fa-route text-primary mr-2"></i>
+        Learning Path - ANN Training Workflow
+    </h3>
+    <ul class="steps steps-vertical lg:steps-horizontal w-full">
+        <li class="step step-primary" data-content="1" id="step1">
+            <span class="hidden lg:inline">Build Network</span>
+            <span class="lg:hidden">Build</span>
+        </li>
+        <li class="step" data-content="2" id="step2">
+            <span class="hidden lg:inline">Input Dataset</span>
+            <span class="lg:hidden">Dataset</span>
+        </li>
+        <li class="step" data-content="3" id="step3">
+            <span class="hidden lg:inline">Forward Pass</span>
+            <span class="lg:hidden">Forward</span>
+        </li>
+        <li class="step" data-content="4" id="step4">
+            <span class="hidden lg:inline">Calculate Loss</span>
+            <span class="lg:hidden">Loss</span>
+        </li>
+        <li class="step" data-content="5" id="step5">
+            <span class="hidden lg:inline">Update Weights (1 Epoch)</span>
+            <span class="lg:hidden">Update</span>
+        </li>
+        <li class="step" data-content="6" id="step6">
+            <span class="hidden lg:inline">Automate Training</span>
+            <span class="lg:hidden">Train</span>
+        </li>
+        <li class="step" data-content="7" id="step7">
+            <span class="hidden lg:inline">View Results</span>
+            <span class="lg:hidden">Results</span>
+        </li>
+    </ul>
+    <div id="stepDescription" class="alert alert-info mt-4 text-sm">
+        <i class="fas fa-info-circle"></i>
+        <span id="stepDescriptionText">Start by building your neural network architecture.</span>
+    </div>
+</div>
