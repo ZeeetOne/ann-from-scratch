@@ -54,211 +54,11 @@ dropZone.addEventListener('drop', handleDrop);
 // Validate dataset when it changes
 datasetInput.addEventListener('input', validateDataset);
 
-// Generate Layer Configuration UI
-function generateLayerConfiguration() {
-    const numLayers = parseInt(numLayersInput.value);
-
-    if (numLayers < 2 || numLayers > 10) {
-        alert('Please enter a number of layers between 2 and 10');
-        return;
-    }
-
-    layersContainer.innerHTML = '';
-    connectionsContainer.innerHTML = '';
-    currentConfig.layers = [];
-    currentConfig.connections = [];
-
-    // Generate layer configuration inputs
-    for (let i = 0; i < numLayers; i++) {
-        const layerDiv = createLayerConfigUI(i, numLayers);
-        layersContainer.appendChild(layerDiv);
-    }
-
-    // Add event listeners to update connections when layer sizes change
-    document.querySelectorAll('.num-nodes-input').forEach(input => {
-        input.addEventListener('change', updateConnectionsConfiguration);
-    });
-
-    updateConnectionsConfiguration();
-
-    // Show and render the network diagram
-    showNetworkDiagram();
-}
-
-// Show and render network diagram
-function showNetworkDiagram() {
-    const networkDiagramEl = document.getElementById('networkDiagram');
-    const numNodesInputs = document.querySelectorAll('.num-nodes-input');
-    const activationSelects = document.querySelectorAll('.activation-select');
-
-    if (numNodesInputs.length === 0) return;
-
-    // Get layer sizes and activations
-    const layerSizes = Array.from(numNodesInputs).map(input => parseInt(input.value) || 0);
-    const activations = Array.from(activationSelects).map(select => select.value);
-
-    // Show diagram
-    networkDiagramEl.style.display = 'block';
-
-    // Render network
-    if (networkDiagram) {
-        networkDiagram.renderNetwork(layerSizes, activations);
-    }
-}
-
-// Create Layer Configuration UI
-function createLayerConfigUI(layerIndex, totalLayers) {
-    const layerDiv = document.createElement('div');
-    layerDiv.className = 'layer-config';
-    layerDiv.id = `layer-${layerIndex}`;
-
-    let layerType = 'Hidden Layer';
-    if (layerIndex === 0) layerType = 'Input Layer';
-    if (layerIndex === totalLayers - 1) layerType = 'Output Layer';
-
-    layerDiv.innerHTML = `
-        <h3>Layer ${layerIndex} - ${layerType}</h3>
-        <div class="form-row">
-            <div class="form-group">
-                <label>Number of Nodes:</label>
-                <input type="number" class="form-control num-nodes-input"
-                       data-layer="${layerIndex}" min="1" max="100" value="${layerIndex === 0 ? 3 : layerIndex === totalLayers - 1 ? 2 : 4}">
-            </div>
-            <div class="form-group">
-                <label>Activation Function:</label>
-                <select class="form-control activation-select" data-layer="${layerIndex}">
-                    <option value="linear" ${layerIndex === 0 ? 'selected' : ''}>Linear (Input)</option>
-                    <option value="sigmoid" ${layerIndex > 0 ? 'selected' : ''}>Sigmoid</option>
-                    <option value="relu">ReLU</option>
-                    <option value="threshold">Threshold</option>
-                </select>
-            </div>
-        </div>
-    `;
-
-    return layerDiv;
-}
-
-// Update Connections Configuration UI
-function updateConnectionsConfiguration() {
-    connectionsContainer.innerHTML = '';
-
-    const numNodesInputs = document.querySelectorAll('.num-nodes-input');
-    const layerSizes = Array.from(numNodesInputs).map(input => parseInt(input.value) || 0);
-
-    // Generate connections for each layer (starting from layer 1)
-    for (let layerIdx = 1; layerIdx < layerSizes.length; layerIdx++) {
-        const connectionDiv = createConnectionConfigUI(layerIdx, layerSizes);
-        connectionsContainer.appendChild(connectionDiv);
-    }
-
-    // Update visual diagram
-    showNetworkDiagram();
-}
-
-// Create Connection Configuration UI
-function createConnectionConfigUI(layerIndex, layerSizes) {
-    const connectionDiv = document.createElement('div');
-    connectionDiv.className = 'connection-config';
-    connectionDiv.id = `connections-layer-${layerIndex}`;
-
-    const prevLayerSize = layerSizes[layerIndex - 1];
-    const currentLayerSize = layerSizes[layerIndex];
-
-    let html = `<h3>Connections: Layer ${layerIndex - 1} → Layer ${layerIndex}</h3>`;
-
-    for (let nodeIdx = 0; nodeIdx < currentLayerSize; nodeIdx++) {
-        html += `
-            <div class="node-connections">
-                <h4>Node ${nodeIdx} in Layer ${layerIndex}</h4>
-                <div class="form-group">
-                    <label>Connect to nodes (comma-separated indices from Layer ${layerIndex - 1}, e.g., "0,1"):</label>
-                    <input type="text" class="form-control connection-indices"
-                           data-layer="${layerIndex}" data-node="${nodeIdx}"
-                           value="${Array.from({length: prevLayerSize}, (_, i) => i).join(',')}"
-                           placeholder="e.g., 0,1,2">
-                </div>
-                <div class="form-group">
-                    <label>Weights (comma-separated, same order as connections):</label>
-                    <input type="text" class="form-control connection-weights"
-                           data-layer="${layerIndex}" data-node="${nodeIdx}"
-                           value="${Array.from({length: prevLayerSize}, () => (Math.random() * 2 - 1).toFixed(3)).join(',')}"
-                           placeholder="e.g., 0.5,-0.3,0.8">
-                </div>
-                <div class="form-group">
-                    <label>Bias:</label>
-                    <input type="number" class="form-control connection-bias"
-                           data-layer="${layerIndex}" data-node="${nodeIdx}"
-                           value="0" step="0.1">
-                </div>
-            </div>
-        `;
-    }
-
-    connectionDiv.innerHTML = html;
-
-    // Add event listeners to sync form changes to diagram
-    setTimeout(() => {
-        const inputs = connectionDiv.querySelectorAll('.connection-indices, .connection-weights, .connection-bias');
-        inputs.forEach(input => {
-            input.addEventListener('change', syncFormToDiagram);
-        });
-    }, 0);
-
-    return connectionDiv;
-}
-
-// Sync form changes to diagram
-function syncFormToDiagram() {
-    if (!networkDiagram || networkDiagram.nodes.length === 0) return;
-
-    const newConnections = [];
-
-    // Parse all connections from form
-    const connectionConfigs = document.querySelectorAll('.connection-config');
-
-    connectionConfigs.forEach((configDiv, configIdx) => {
-        const layerIdx = configIdx + 1;
-        const nodeConnections = configDiv.querySelectorAll('.node-connections');
-
-        nodeConnections.forEach((nodeDiv, nodeIdx) => {
-            const indicesInput = nodeDiv.querySelector('.connection-indices');
-            const weightsInput = nodeDiv.querySelector('.connection-weights');
-            const biasInput = nodeDiv.querySelector('.connection-bias');
-
-            if (!indicesInput || !weightsInput || !biasInput) return;
-
-            // Parse connection indices
-            const indices = indicesInput.value.split(',').map(s => parseInt(s.trim())).filter(n => !isNaN(n));
-
-            // Parse weights
-            const weights = weightsInput.value.split(',').map(s => parseFloat(s.trim())).filter(n => !isNaN(n));
-
-            // Parse bias
-            const bias = parseFloat(biasInput.value) || 0;
-
-            // Create connections
-            indices.forEach((fromIdx, i) => {
-                const fromNode = networkDiagram.nodes.find(n => n.layer === layerIdx - 1 && n.index === fromIdx);
-                const toNode = networkDiagram.nodes.find(n => n.layer === layerIdx && n.index === nodeIdx);
-
-                if (fromNode && toNode) {
-                    newConnections.push({
-                        from: fromNode.id,
-                        to: toNode.id,
-                        weight: (weights[i] || 0).toFixed(3),
-                        bias: bias,
-                        element: null
-                    });
-                }
-            });
-        });
-    });
-
-    // Update diagram connections
-    networkDiagram.connections = newConnections;
-    networkDiagram.renderConnections();
-}
+// ============================
+// Old UI Functions (Removed)
+// ============================
+// These functions were part of the old manual network configuration UI
+// Now replaced by InteractiveNetworkBuilder in network-builder.js
 
 // Build Network
 async function buildNetwork() {
@@ -688,10 +488,18 @@ async function runForwardPass() {
             // Display all results in table
             displayForwardPassSummary(null, data);
             displayForwardPass(null, data);
-            showSuccess(`Forward pass completed! ${data.num_samples} samples analyzed.`);
+            showSuccess(`Forward pass completed! ${data.num_samples} samples analyzed. Next: Calculate Loss`);
 
             // Update progress to step 3
             updateStep(3);
+
+            // Switch to Loss tab after 2 seconds
+            setTimeout(() => {
+                const lossTab = document.getElementById('tab-loss');
+                if (lossTab) {
+                    lossTab.checked = true;
+                }
+            }, 2000);
         } else {
             showError('Error: ' + data.error);
         }
@@ -843,10 +651,18 @@ async function calculateLoss() {
 
         if (data.success) {
             displayLoss(data);
-            showSuccess('Loss calculated successfully!');
+            showSuccess('Loss calculated successfully! Next: Run 1 Epoch to update weights');
 
             // Update progress to step 4
             updateStep(4);
+
+            // Switch to Epoch Summary tab after 2 seconds
+            setTimeout(() => {
+                const epochTab = document.getElementById('tab-epoch');
+                if (epochTab) {
+                    epochTab.checked = true;
+                }
+            }, 2000);
         } else {
             showError('Error calculating loss: ' + data.error);
         }
@@ -1129,8 +945,8 @@ async function run1Epoch() {
         }
 
         const lossFunction = lossFunctionSelect.value;
-        const optimizer = document.getElementById('optimizer').value;
-        const learningRate = parseFloat(document.getElementById('learningRate').value);
+        const optimizer = document.getElementById('optimizerSelect').value;
+        const learningRate = parseFloat(document.getElementById('optimizerLearningRate').value);
 
         // Validation
         if (learningRate <= 0 || learningRate > 10) {
@@ -1160,12 +976,25 @@ async function run1Epoch() {
         const data = await response.json();
 
         if (data.success) {
-            // Display results with emphasis on 1 epoch completion
-            display1EpochResults(data);
-            showSuccess('✅ 1 Epoch Completed! (Forward Pass → Loss Calculation → Weight Update)');
+            // Display epoch summary
+            displayEpochSummary(data);
+            showSuccess('✅ 1 Epoch Completed! See full training cycle summary.');
 
             // Update progress to step 5
             updateStep(5);
+
+            // Switch to Epoch Summary tab after 1.5 seconds
+            setTimeout(() => {
+                const epochTab = document.getElementById('tab-epoch');
+                if (epochTab) {
+                    epochTab.checked = true;
+                    // Scroll to epoch summary
+                    const epochContainer = document.getElementById('epochSummaryContainer');
+                    if (epochContainer) {
+                        epochContainer.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                    }
+                }
+            }, 1500);
         } else {
             showError('Error during 1 epoch: ' + data.error);
         }
@@ -1179,87 +1008,246 @@ async function run1Epoch() {
     }
 }
 
-// Display 1 Epoch Results
-function display1EpochResults(data) {
-    const { optimizer, learning_rate, loss_before, loss_after, loss_reduction } = data;
+// Display Epoch Summary (Complete Training Cycle)
+function displayEpochSummary(data) {
+    const { optimizer, learning_rate, loss_before, loss_after, loss_reduction, backprop_data, updated_weights } = data;
+    const container = document.getElementById('epochSummaryContainer');
 
-    let html = '<div class="card bg-base-100 shadow-xl mt-6">';
+    if (!container) {
+        console.error('epochSummaryContainer not found');
+        return;
+    }
+
+    let html = '';
+
+    // Header with completion badge
+    html += '<div class="card bg-gradient-to-br from-purple-600 to-blue-500 text-white shadow-xl">';
     html += '<div class="card-body">';
-
-    // Header
-    html += '<div class="flex items-center gap-3 mb-4">';
-    html += '<div class="badge badge-success badge-lg gap-2">';
-    html += '<i class="fas fa-check-circle"></i> 1 EPOCH COMPLETED';
+    html += '<div class="flex items-center justify-between">';
+    html += '<h3 class="text-2xl font-bold flex items-center gap-3">';
+    html += '<i class="fas fa-check-circle text-green-300"></i>';
+    html += '1 Complete Epoch Executed';
+    html += '</h3>';
+    html += '<div class="badge badge-success badge-lg">CYCLE COMPLETED</div>';
+    html += '</div>';
+    html += '<p class="opacity-90 mt-2">Full training cycle: Forward → Loss → Backprop → Update → Forward (new) → Loss (new)</p>';
     html += '</div>';
     html += '</div>';
 
-    // Explanation
-    html += '<div class="alert alert-info mb-4">';
-    html += '<i class="fas fa-info-circle"></i>';
+    // Step 1: Initial Forward Pass & Loss
+    html += '<div class="card bg-base-100 shadow-lg">';
+    html += '<div class="card-body">';
+    html += '<h4 class="card-title text-blue-600 flex items-center gap-2">';
+    html += '<div class="badge badge-info">1</div>';
+    html += '<i class="fas fa-arrow-right"></i> Initial Forward Pass & Loss';
+    html += '</h4>';
+    html += '<div class="stats shadow">';
+    html += `<div class="stat">
+        <div class="stat-title">Initial Loss (Before Training)</div>
+        <div class="stat-value text-error">${loss_before.toFixed(6)}</div>
+        <div class="stat-desc">Error before weight updates</div>
+    </div>`;
+    html += '</div>';
+    html += '</div>';
+    html += '</div>';
+
+    // Step 2: Backpropagation
+    html += '<div class="card bg-base-100 shadow-lg">';
+    html += '<div class="card-body">';
+    html += '<h4 class="card-title text-orange-600 flex items-center gap-2">';
+    html += '<div class="badge badge-warning">2</div>';
+    html += '<i class="fas fa-arrow-left"></i> Backpropagation';
+    html += '</h4>';
+    html += '<div class="alert alert-warning">';
+    html += '<i class="fas fa-calculator"></i>';
     html += '<div>';
-    html += '<p class="font-bold">What happened in this epoch:</p>';
-    html += '<ol class="list-decimal list-inside text-sm mt-2 space-y-1">';
-    html += '<li><strong>Forward Pass:</strong> Network made predictions on all samples</li>';
-    html += '<li><strong>Loss Calculation:</strong> Measured prediction error</li>';
-    html += '<li><strong>Backpropagation:</strong> Calculated gradients</li>';
-    html += '<li><strong>Weight Update:</strong> Adjusted weights to reduce loss</li>';
-    html += '</ol>';
+    html += '<p class="font-bold">Gradient Calculation (Batch Average)</p>';
+    html += '<p class="text-sm">Computed gradients show how much each weight should change to reduce loss.</p>';
     html += '</div>';
     html += '</div>';
 
-    // Metrics
+    // Show average gradients if available
+    if (backprop_data && backprop_data.avg_gradients) {
+        html += '<div class="overflow-x-auto">';
+        html += '<table class="table table-zebra table-sm">';
+        html += '<thead><tr><th>Layer</th><th>Avg Gradient Magnitude</th></tr></thead>';
+        html += '<tbody>';
+        backprop_data.avg_gradients.forEach((grad, idx) => {
+            html += `<tr><td>Layer ${idx + 1}</td><td>${grad.toFixed(6)}</td></tr>`;
+        });
+        html += '</tbody></table>';
+        html += '</div>';
+    } else {
+        html += '<p class="text-sm"><i class="fas fa-info-circle mr-2"></i>Gradients calculated for all weights based on loss.</p>';
+    }
+    html += '</div>';
+    html += '</div>';
+
+    // Step 3: Weight Update
+    html += '<div class="card bg-base-100 shadow-lg">';
+    html += '<div class="card-body">';
+    html += '<h4 class="card-title text-purple-600 flex items-center gap-2">';
+    html += '<div class="badge badge-secondary">3</div>';
+    html += '<i class="fas fa-sync-alt"></i> Update Weights';
+    html += '</h4>';
     html += '<div class="stats stats-vertical lg:stats-horizontal shadow w-full">';
     html += `<div class="stat">
+        <div class="stat-figure text-secondary"><i class="fas fa-brain text-2xl"></i></div>
         <div class="stat-title">Optimizer</div>
-        <div class="stat-value text-lg">${optimizer.toUpperCase()}</div>
-        <div class="stat-desc">Learning Rate: ${learning_rate}</div>
+        <div class="stat-value text-sm">${optimizer.toUpperCase()}</div>
     </div>`;
     html += `<div class="stat">
-        <div class="stat-title">Loss Before</div>
-        <div class="stat-value text-error text-lg">${loss_before.toFixed(6)}</div>
+        <div class="stat-figure text-accent"><i class="fas fa-tachometer-alt text-2xl"></i></div>
+        <div class="stat-title">Learning Rate</div>
+        <div class="stat-value text-sm">${learning_rate}</div>
     </div>`;
     html += `<div class="stat">
-        <div class="stat-title">Loss After</div>
-        <div class="stat-value text-success text-lg">${loss_after.toFixed(6)}</div>
-    </div>`;
-    html += `<div class="stat">
-        <div class="stat-title">Improvement</div>
-        <div class="stat-value text-success text-lg">↓ ${((loss_reduction / loss_before) * 100).toFixed(2)}%</div>
-        <div class="stat-desc">${loss_reduction.toFixed(6)} reduction</div>
+        <div class="stat-figure text-info"><i class="fas fa-weight text-2xl"></i></div>
+        <div class="stat-title">Weights Updated</div>
+        <div class="stat-value text-sm">${updated_weights || 'All'}</div>
     </div>`;
     html += '</div>';
+    html += '<p class="text-sm mt-2"><i class="fas fa-formula mr-2"></i><strong>Formula:</strong> new_weight = old_weight - (learning_rate × gradient)</p>';
 
-    // Next step guide
-    html += '<div class="alert alert-success mt-4">';
+    // Add collapsible weight details
+    if (data.weight_changes && data.new_weights && data.old_weights) {
+        html += '<div class="collapse collapse-arrow bg-base-200 mt-4">';
+        html += '<input type="checkbox" />';
+        html += '<div class="collapse-title text-base font-medium">';
+        html += '<i class="fas fa-table mr-2"></i>View Detailed Weight Updates';
+        html += '</div>';
+        html += '<div class="collapse-content">';
+
+        // Weight changes per layer
+        html += '<div class="overflow-x-auto mt-2">';
+
+        for (const [layerKey, layerWeightChanges] of Object.entries(data.weight_changes)) {
+            const layerIdx = layerKey.split('_')[1];
+            const layerBiasChanges = data.bias_changes ? data.bias_changes[layerKey] : [];
+
+            html += `<div class="mb-6">`;
+            html += `<h5 class="font-bold text-purple-600 mb-3 flex items-center gap-2">`;
+            html += `<i class="fas fa-layer-group"></i> Layer ${layerIdx}`;
+            html += `</h5>`;
+            html += '<table class="table table-zebra table-sm">';
+            html += '<thead><tr>';
+            html += '<th>Node</th>';
+            html += '<th>Old Weights</th>';
+            html += '<th>New Weights</th>';
+            html += '<th>ΔW (Change)</th>';
+            if (layerBiasChanges && layerBiasChanges.length > 0) {
+                html += '<th>Bias Change</th>';
+            }
+            html += '</tr></thead>';
+            html += '<tbody>';
+
+            layerWeightChanges.forEach((nodeChanges, nodeIdx) => {
+                html += '<tr>';
+                html += `<td class="font-bold">Node ${nodeIdx}</td>`;
+
+                // Old weights
+                html += '<td><span class="font-mono text-xs">[';
+                html += data.old_weights[layerKey][nodeIdx].map(w => w.toFixed(4)).join(', ');
+                html += ']</span></td>';
+
+                // New weights
+                html += '<td><span class="font-mono text-xs">[';
+                html += data.new_weights[layerKey][nodeIdx].map(w => w.toFixed(4)).join(', ');
+                html += ']</span></td>';
+
+                // Weight changes
+                html += '<td><span class="font-mono text-xs">[';
+                html += nodeChanges.map(c => {
+                    const sign = c >= 0 ? '+' : '';
+                    const colorClass = c >= 0 ? 'text-success' : 'text-error';
+                    return `<span class="${colorClass} font-semibold">${sign}${c.toFixed(4)}</span>`;
+                }).join(', ');
+                html += ']</span></td>';
+
+                // Bias change (if available)
+                if (layerBiasChanges && layerBiasChanges.length > nodeIdx) {
+                    const biasChange = layerBiasChanges[nodeIdx];
+                    const biasSign = biasChange >= 0 ? '+' : '';
+                    const biasColorClass = biasChange >= 0 ? 'text-success' : 'text-error';
+                    html += `<td><span class="font-mono text-xs ${biasColorClass} font-semibold">${biasSign}${biasChange.toFixed(4)}</span></td>`;
+                }
+
+                html += '</tr>';
+            });
+
+            html += '</tbody></table>';
+            html += '</div>';
+        }
+
+        html += '</div>';
+        html += '</div>';
+        html += '</div>';
+    }
+
+    html += '</div>';
+    html += '</div>';
+
+    // Step 4: New Forward Pass & Loss
+    html += '<div class="card bg-base-100 shadow-lg">';
+    html += '<div class="card-body">';
+    html += '<h4 class="card-title text-green-600 flex items-center gap-2">';
+    html += '<div class="badge badge-success">4</div>';
+    html += '<i class="fas fa-arrow-right"></i> Forward Pass (with Updated Weights)';
+    html += '</h4>';
+    html += '<div class="stats shadow">';
+    html += `<div class="stat">
+        <div class="stat-title">New Loss (After Training)</div>
+        <div class="stat-value text-success">${loss_after.toFixed(6)}</div>
+        <div class="stat-desc">Error after weight updates</div>
+    </div>`;
+    html += '</div>';
+    html += '</div>';
+    html += '</div>';
+
+    // Comparison & Improvement
+    html += '<div class="card bg-gradient-to-r from-green-500 to-teal-500 text-white shadow-xl">';
+    html += '<div class="card-body">';
+    html += '<h4 class="card-title text-2xl">';
+    html += '<i class="fas fa-chart-line mr-2"></i> Training Impact';
+    html += '</h4>';
+    html += '<div class="grid grid-cols-1 md:grid-cols-3 gap-4">';
+    html += `<div class="bg-white/20 rounded-lg p-4 backdrop-blur">
+        <p class="text-sm opacity-90">Loss Before</p>
+        <p class="text-3xl font-bold">${loss_before.toFixed(6)}</p>
+    </div>`;
+    html += `<div class="bg-white/20 rounded-lg p-4 backdrop-blur">
+        <p class="text-sm opacity-90">Loss After</p>
+        <p class="text-3xl font-bold">${loss_after.toFixed(6)}</p>
+    </div>`;
+    html += `<div class="bg-white/20 rounded-lg p-4 backdrop-blur">
+        <p class="text-sm opacity-90">Improvement</p>
+        <p class="text-3xl font-bold">↓ ${((loss_reduction / loss_before) * 100).toFixed(2)}%</p>
+        <p class="text-xs opacity-75">${loss_reduction.toFixed(6)} reduction</p>
+    </div>`;
+    html += '</div>';
+    html += '</div>';
+    html += '</div>';
+
+    // Next steps
+    html += '<div class="alert alert-info shadow-lg">';
     html += '<i class="fas fa-lightbulb"></i>';
     html += '<div>';
-    html += '<p class="font-bold">Next Steps:</p>';
-    html += '<ul class="text-sm mt-2 space-y-1">';
-    html += '<li>• Run more epochs by clicking "Run 1 Epoch" again to see incremental improvements</li>';
-    html += '<li>• Or use "Start Automated Training" to run many epochs automatically</li>';
+    html += '<p class="font-bold">What You Learned:</p>';
+    html += '<ul class="text-sm mt-2 space-y-1 list-disc list-inside">';
+    html += '<li>How forward pass generates predictions</li>';
+    html += '<li>How loss measures prediction error</li>';
+    html += '<li>How backpropagation calculates gradients</li>';
+    html += '<li>How optimizer updates weights to improve performance</li>';
+    html += '</ul>';
+    html += '<p class="font-bold mt-3">Next Steps:</p>';
+    html += '<ul class="text-sm mt-1 space-y-1 list-disc list-inside">';
+    html += '<li>Click "Run 1 Complete Epoch" again to see more improvement</li>';
+    html += '<li>Or go to "Automate Training" tab to run many epochs at once</li>';
     html += '</ul>';
     html += '</div>';
     html += '</div>';
 
-    html += '</div>';
-    html += '</div>';
-
-    // Insert before training progress section
-    const trainSection = document.querySelector('#train');
-    const existingResults = trainSection.querySelector('.epoch-results');
-    if (existingResults) {
-        existingResults.remove();
-    }
-
-    const resultsDiv = document.createElement('div');
-    resultsDiv.className = 'epoch-results';
-    resultsDiv.innerHTML = html;
-
-    const trainingProgress = document.getElementById('trainingProgress');
-    trainSection.insertBefore(resultsDiv, trainingProgress);
-
-    // Scroll to results
-    resultsDiv.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    container.innerHTML = html;
 }
 
 // NOTE: makePredictions and displayResults functions are commented out
@@ -1391,11 +1379,6 @@ async function startTraining() {
                 displayModelEvaluation(data.evaluation);
             }
 
-            // Update charts with training history
-            if (data.history && typeof updateCharts === 'function') {
-                updateCharts(data.history);
-            }
-
             showSuccess('Training completed successfully!');
 
             // Update progress to step 6
@@ -1407,6 +1390,14 @@ async function startTraining() {
                 if (resultsTab) {
                     resultsTab.checked = true;
                     updateStep(7);
+
+                    // Update charts after tab is visible
+                    setTimeout(() => {
+                        if (data.history && typeof updateCharts === 'function') {
+                            console.log('Updating charts with training history');
+                            updateCharts(data.history);
+                        }
+                    }, 300);
                 }
             }, 1000);
         } else {
@@ -1752,460 +1743,10 @@ function renderLossCurve(history) {
 // ============================
 // Network Diagram Visualization
 // ============================
-
-class NetworkDiagram {
-    constructor(canvasId) {
-        this.canvas = document.getElementById(canvasId);
-        this.nodes = [];
-        this.connections = [];
-        this.layers = [];
-        this.draggedNode = null;
-        this.dragStartNode = null;
-        this.tempLine = null;
-        this.selectedConnection = null;
-
-        this.nodeRadius = 25;
-        this.layerSpacing = 200;
-        this.nodeSpacing = 80;
-
-        this.init();
-    }
-
-    init() {
-        // Clear canvas
-        this.canvas.innerHTML = '';
-        this.canvas.style.height = '500px';
-
-        // Add mouse/touch event listeners
-        this.canvas.addEventListener('mousedown', this.handleMouseDown.bind(this));
-        this.canvas.addEventListener('mousemove', this.handleMouseMove.bind(this));
-        this.canvas.addEventListener('mouseup', this.handleMouseUp.bind(this));
-        this.canvas.addEventListener('contextmenu', (e) => e.preventDefault());
-    }
-
-    renderNetwork(layerSizes, activations, existingConnections = null) {
-        this.clear();
-        this.layers = layerSizes;
-
-        const canvasWidth = this.canvas.clientWidth;
-        const canvasHeight = Math.max(500, Math.max(...layerSizes) * this.nodeSpacing + 100);
-        this.canvas.style.height = canvasHeight + 'px';
-
-        // Calculate layer positions
-        const totalWidth = (layerSizes.length - 1) * this.layerSpacing;
-        const startX = (canvasWidth - totalWidth) / 2;
-
-        // Create nodes
-        this.nodes = [];
-        layerSizes.forEach((numNodes, layerIdx) => {
-            const layerNodes = [];
-            const layerHeight = (numNodes - 1) * this.nodeSpacing;
-            const startY = (canvasHeight - layerHeight) / 2;
-
-            for (let nodeIdx = 0; nodeIdx < numNodes; nodeIdx++) {
-                const node = {
-                    id: `L${layerIdx}N${nodeIdx}`,
-                    layer: layerIdx,
-                    index: nodeIdx,
-                    x: startX + layerIdx * this.layerSpacing,
-                    y: startY + nodeIdx * this.nodeSpacing,
-                    activation: activations[layerIdx] || 'sigmoid',
-                    element: null
-                };
-
-                layerNodes.push(node);
-                this.nodes.push(node);
-            }
-        });
-
-        // Create default connections (fully connected) or use existing
-        this.connections = [];
-        if (existingConnections) {
-            this.connections = existingConnections;
-        } else {
-            // Default: fully connected network
-            for (let layerIdx = 1; layerIdx < layerSizes.length; layerIdx++) {
-                const prevLayerNodes = this.nodes.filter(n => n.layer === layerIdx - 1);
-                const currLayerNodes = this.nodes.filter(n => n.layer === layerIdx);
-
-                currLayerNodes.forEach(toNode => {
-                    prevLayerNodes.forEach(fromNode => {
-                        this.connections.push({
-                            from: fromNode.id,
-                            to: toNode.id,
-                            weight: (Math.random() * 2 - 1).toFixed(3),
-                            bias: 0,
-                            element: null
-                        });
-                    });
-                });
-            }
-        }
-
-        // Render
-        this.renderConnections();
-        this.renderNodes();
-    }
-
-    renderNodes() {
-        this.nodes.forEach(node => {
-            const nodeEl = document.createElement('div');
-            nodeEl.className = 'network-node';
-            nodeEl.textContent = node.index;
-            nodeEl.style.left = (node.x - this.nodeRadius) + 'px';
-            nodeEl.style.top = (node.y - this.nodeRadius) + 'px';
-            nodeEl.dataset.nodeId = node.id;
-
-            // Add layer-specific class
-            if (node.layer === 0) {
-                nodeEl.classList.add('input-layer');
-            } else if (node.layer === this.layers.length - 1) {
-                nodeEl.classList.add('output-layer');
-            } else {
-                nodeEl.classList.add('hidden-layer');
-            }
-
-            // Add label
-            const label = document.createElement('div');
-            label.className = 'node-label';
-            label.textContent = `L${node.layer}N${node.index}`;
-            nodeEl.appendChild(label);
-
-            node.element = nodeEl;
-            this.canvas.appendChild(nodeEl);
-        });
-    }
-
-    renderConnections() {
-        // Remove old connection elements
-        this.canvas.querySelectorAll('.connection-line, .connection-weight').forEach(el => el.remove());
-
-        this.connections.forEach((conn, idx) => {
-            const fromNode = this.nodes.find(n => n.id === conn.from);
-            const toNode = this.nodes.find(n => n.id === conn.to);
-
-            if (!fromNode || !toNode) return;
-
-            // Create SVG line
-            const svg = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
-            svg.classList.add('connection-line');
-            svg.dataset.connIndex = idx;
-            svg.style.pointerEvents = 'none';
-
-            const line = document.createElementNS('http://www.w3.org/2000/svg', 'line');
-            line.setAttribute('x1', fromNode.x);
-            line.setAttribute('y1', fromNode.y);
-            line.setAttribute('x2', toNode.x);
-            line.setAttribute('y2', toNode.y);
-            line.style.pointerEvents = 'stroke';
-
-            // Add click handler for editing
-            line.addEventListener('click', (e) => {
-                e.stopPropagation();
-                this.openConnectionModal(idx);
-            });
-
-            svg.appendChild(line);
-
-            // Position SVG to cover the line area
-            const minX = Math.min(fromNode.x, toNode.x);
-            const minY = Math.min(fromNode.y, toNode.y);
-            const width = Math.abs(toNode.x - fromNode.x);
-            const height = Math.abs(toNode.y - fromNode.y);
-
-            svg.style.left = minX + 'px';
-            svg.style.top = minY + 'px';
-            svg.style.width = width + 'px';
-            svg.style.height = height + 'px';
-            svg.setAttribute('viewBox', `${minX} ${minY} ${width} ${height}`);
-
-            conn.element = svg;
-            this.canvas.insertBefore(svg, this.canvas.firstChild);
-
-            // Add weight label
-            const weightLabel = document.createElement('div');
-            weightLabel.className = 'connection-weight';
-            weightLabel.textContent = `w:${conn.weight}`;
-            weightLabel.style.left = ((fromNode.x + toNode.x) / 2 - 20) + 'px';
-            weightLabel.style.top = ((fromNode.y + toNode.y) / 2 - 10) + 'px';
-            weightLabel.dataset.connIndex = idx;
-            this.canvas.appendChild(weightLabel);
-        });
-    }
-
-    handleMouseDown(e) {
-        const nodeEl = e.target.closest('.network-node');
-        if (!nodeEl) return;
-
-        const nodeId = nodeEl.dataset.nodeId;
-        const node = this.nodes.find(n => n.id === nodeId);
-
-        this.dragStartNode = node;
-        nodeEl.classList.add('dragging');
-    }
-
-    handleMouseMove(e) {
-        if (!this.dragStartNode) return;
-
-        // Remove existing temp line
-        if (this.tempLine) {
-            this.tempLine.remove();
-            this.tempLine = null;
-        }
-
-        // Get mouse position relative to canvas
-        const rect = this.canvas.getBoundingClientRect();
-        const mouseX = e.clientX - rect.left;
-        const mouseY = e.clientY - rect.top;
-
-        // Create temporary line
-        const svg = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
-        svg.classList.add('temp-connection');
-        svg.style.position = 'absolute';
-        svg.style.left = '0';
-        svg.style.top = '0';
-        svg.style.width = '100%';
-        svg.style.height = '100%';
-        svg.style.pointerEvents = 'none';
-
-        const line = document.createElementNS('http://www.w3.org/2000/svg', 'line');
-        line.setAttribute('x1', this.dragStartNode.x);
-        line.setAttribute('y1', this.dragStartNode.y);
-        line.setAttribute('x2', mouseX);
-        line.setAttribute('y2', mouseY);
-
-        svg.appendChild(line);
-        this.tempLine = svg;
-        this.canvas.appendChild(svg);
-
-        // Highlight valid target nodes
-        this.nodes.forEach(n => {
-            if (n.element) {
-                n.element.classList.remove('drag-target');
-            }
-        });
-
-        const targetNode = this.getNodeAtPosition(mouseX, mouseY);
-        if (targetNode && this.isValidConnection(this.dragStartNode, targetNode)) {
-            targetNode.element.classList.add('drag-target');
-        }
-    }
-
-    handleMouseUp(e) {
-        if (!this.dragStartNode) return;
-
-        // Remove temp line
-        if (this.tempLine) {
-            this.tempLine.remove();
-            this.tempLine = null;
-        }
-
-        // Remove dragging state
-        this.nodes.forEach(n => {
-            if (n.element) {
-                n.element.classList.remove('dragging', 'drag-target');
-            }
-        });
-
-        // Get target node
-        const rect = this.canvas.getBoundingClientRect();
-        const mouseX = e.clientX - rect.left;
-        const mouseY = e.clientY - rect.top;
-        const targetNode = this.getNodeAtPosition(mouseX, mouseY);
-
-        if (targetNode && this.isValidConnection(this.dragStartNode, targetNode)) {
-            // Check if connection already exists
-            const existingIdx = this.connections.findIndex(
-                c => c.from === this.dragStartNode.id && c.to === targetNode.id
-            );
-
-            if (existingIdx >= 0) {
-                // Connection exists, open modal to edit or remove
-                this.openConnectionModal(existingIdx);
-            } else {
-                // Create new connection
-                this.connections.push({
-                    from: this.dragStartNode.id,
-                    to: targetNode.id,
-                    weight: (Math.random() * 2 - 1).toFixed(3),
-                    bias: 0,
-                    element: null
-                });
-                this.renderConnections();
-                this.syncToForm();
-                showSuccess('Connection created! Click on the line to edit weight/bias.');
-            }
-        }
-
-        this.dragStartNode = null;
-    }
-
-    getNodeAtPosition(x, y) {
-        for (let node of this.nodes) {
-            const dx = node.x - x;
-            const dy = node.y - y;
-            const distance = Math.sqrt(dx * dx + dy * dy);
-
-            if (distance <= this.nodeRadius) {
-                return node;
-            }
-        }
-        return null;
-    }
-
-    isValidConnection(fromNode, toNode) {
-        // Can only connect from earlier layer to later layer
-        return fromNode.layer < toNode.layer && fromNode.id !== toNode.id;
-    }
-
-    openConnectionModal(connIndex) {
-        this.selectedConnection = connIndex;
-        const conn = this.connections[connIndex];
-
-        const modal = document.getElementById('connectionModal');
-        const connectionInfo = document.getElementById('connectionInfo');
-        const weightInput = document.getElementById('modalWeight');
-        const biasInput = document.getElementById('modalBias');
-
-        connectionInfo.textContent = `Connection: ${conn.from} → ${conn.to}`;
-        weightInput.value = conn.weight;
-        biasInput.value = conn.bias;
-
-        modal.classList.add('show');
-    }
-
-    closeConnectionModal() {
-        const modal = document.getElementById('connectionModal');
-        modal.classList.remove('show');
-        this.selectedConnection = null;
-    }
-
-    saveConnection() {
-        if (this.selectedConnection === null) return;
-
-        const weightInput = document.getElementById('modalWeight');
-        const biasInput = document.getElementById('modalBias');
-
-        this.connections[this.selectedConnection].weight = parseFloat(weightInput.value).toFixed(3);
-        this.connections[this.selectedConnection].bias = parseFloat(biasInput.value);
-
-        this.renderConnections();
-        this.syncToForm();
-        this.closeConnectionModal();
-        showSuccess('Connection updated!');
-    }
-
-    deleteConnection() {
-        if (this.selectedConnection === null) return;
-
-        this.connections.splice(this.selectedConnection, 1);
-        this.renderConnections();
-        this.syncToForm();
-        this.closeConnectionModal();
-        showSuccess('Connection deleted!');
-    }
-
-    syncToForm() {
-        // Update the connection form inputs based on diagram state
-        const connectionsContainer = document.getElementById('connectionsContainer');
-
-        // Group connections by target layer and node
-        const connectionsByTarget = {};
-
-        this.connections.forEach(conn => {
-            const toNode = this.nodes.find(n => n.id === conn.to);
-            const fromNode = this.nodes.find(n => n.id === conn.from);
-
-            if (!toNode || !fromNode) return;
-
-            const key = `${toNode.layer}-${toNode.index}`;
-            if (!connectionsByTarget[key]) {
-                connectionsByTarget[key] = {
-                    layer: toNode.layer,
-                    node: toNode.index,
-                    indices: [],
-                    weights: [],
-                    bias: conn.bias
-                };
-            }
-
-            connectionsByTarget[key].indices.push(fromNode.index);
-            connectionsByTarget[key].weights.push(conn.weight);
-        });
-
-        // Update form inputs
-        Object.values(connectionsByTarget).forEach(connData => {
-            const indicesInput = document.querySelector(
-                `.connection-indices[data-layer="${connData.layer}"][data-node="${connData.node}"]`
-            );
-            const weightsInput = document.querySelector(
-                `.connection-weights[data-layer="${connData.layer}"][data-node="${connData.node}"]`
-            );
-            const biasInput = document.querySelector(
-                `.connection-bias[data-layer="${connData.layer}"][data-node="${connData.node}"]`
-            );
-
-            if (indicesInput) indicesInput.value = connData.indices.join(',');
-            if (weightsInput) weightsInput.value = connData.weights.join(',');
-            if (biasInput) biasInput.value = connData.bias;
-        });
-    }
-
-    clear() {
-        this.canvas.innerHTML = '';
-        this.nodes = [];
-        this.connections = [];
-        this.layers = [];
-    }
-}
-
-// Create global diagram instance
-let networkDiagram = null;
-
-// Modal Event Handlers
-const connectionModal = document.getElementById('connectionModal');
-const modalClose = document.querySelector('.modal-close');
-const saveConnectionBtn = document.getElementById('saveConnectionBtn');
-const deleteConnectionBtn = document.getElementById('deleteConnectionBtn');
-const cancelConnectionBtn = document.getElementById('cancelConnectionBtn');
-
-if (modalClose) {
-    modalClose.addEventListener('click', () => {
-        if (networkDiagram) networkDiagram.closeConnectionModal();
-    });
-}
-
-if (saveConnectionBtn) {
-    saveConnectionBtn.addEventListener('click', () => {
-        if (networkDiagram) networkDiagram.saveConnection();
-    });
-}
-
-if (deleteConnectionBtn) {
-    deleteConnectionBtn.addEventListener('click', () => {
-        if (networkDiagram) networkDiagram.deleteConnection();
-    });
-}
-
-if (cancelConnectionBtn) {
-    cancelConnectionBtn.addEventListener('click', () => {
-        if (networkDiagram) networkDiagram.closeConnectionModal();
-    });
-}
-
-// Close modal when clicking outside
-if (connectionModal) {
-    connectionModal.addEventListener('click', (e) => {
-        if (e.target === connectionModal) {
-            if (networkDiagram) networkDiagram.closeConnectionModal();
-        }
-    });
-}
+// NOTE: NetworkDiagram class has been removed to avoid conflict with InteractiveNetworkBuilder
+// InteractiveNetworkBuilder in network-builder.js handles all network visualization
 
 // Initialize
 window.addEventListener('DOMContentLoaded', () => {
     console.log('ANN from Scratch - Ready!');
-
-    // Initialize network diagram
-    networkDiagram = new NetworkDiagram('diagramCanvas');
 });

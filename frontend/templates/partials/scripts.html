@@ -20,6 +20,9 @@
         const tabMap = {
             '#build': 'tab-build',
             '#dataset': 'tab-dataset',
+            '#forward': 'tab-forward',
+            '#loss': 'tab-loss',
+            '#epoch': 'tab-epoch',
             '#train': 'tab-train',
             '#results': 'tab-results'
         };
@@ -97,9 +100,9 @@
             2: '✅ Step 2 Complete: Dataset loaded!',
             3: '✅ Step 3 Complete: Forward pass executed!',
             4: '✅ Step 4 Complete: Loss calculated!',
-            5: '✅ Step 5 Complete: Weights updated (1 epoch)!',
-            6: '✅ Step 6 Complete: Training finished!',
-            7: '✅ Step 7 Complete: View your results!'
+            5: '✅ Step 5 Complete: Epoch summary generated! See backpropagation & weight updates.',
+            6: '✅ Optional Step: Automated training completed!',
+            7: '✅ Optional Step: View comprehensive results and metrics!'
         };
 
         if (stepMessages[stepNumber]) {
@@ -111,12 +114,12 @@
     function updateStepDescription(stepNumber) {
         const descriptions = {
             1: 'Next: Load or generate a dataset that matches your network architecture.',
-            2: 'Next: You can manually run Forward Pass and Calculate Loss to understand the process, or skip directly to "Run 1 Epoch".',
-            3: 'Next: Calculate the loss to measure how far off the predictions are.',
-            4: 'Next: Click "Run 1 Epoch" to complete one full training cycle (Forward Pass → Loss → Update Weights).',
-            5: 'Great! You completed 1 epoch. Run it again for more improvement, or use "Start Automated Training" for many epochs.',
-            6: 'Next: View detailed training results, loss curves, and model evaluation metrics in the Results tab.',
-            7: 'All done! Analyze your results and experiment with different architectures or hyperparameters.'
+            2: 'Next: Run Forward Pass to see how your network makes predictions.',
+            3: 'Next: Calculate Loss to measure prediction error.',
+            4: 'Next: View Epoch Summary to see complete training cycle (Backprop → Update → New Loss).',
+            5: 'Excellent! You completed 1 epoch and saw the full learning cycle. Now you can: (1) Repeat for more epochs, or (2) Use Automated Training for multiple epochs.',
+            6: 'Optional: View comprehensive training metrics, loss curves, and model performance in Results tab.',
+            7: 'All done! Analyze results and experiment with different architectures or hyperparameters.'
         };
 
         const descText = document.getElementById('stepDescriptionText');
@@ -230,13 +233,34 @@
 
     // Initialize charts on page load
     document.addEventListener('DOMContentLoaded', () => {
+        console.log('Initializing charts...');
         initializeLossChart();
         initializeAccuracyChart();
+
+        // Re-initialize charts when Results tab is opened
+        const resultsTab = document.getElementById('tab-results');
+        if (resultsTab) {
+            resultsTab.addEventListener('change', () => {
+                if (resultsTab.checked) {
+                    console.log('Results tab opened, re-rendering charts...');
+                    // Small delay to ensure container is visible
+                    setTimeout(() => {
+                        if (lossChart) lossChart.resize();
+                        if (accuracyChart) accuracyChart.resize();
+                    }, 100);
+                }
+            });
+        }
     });
 
     // Helper function to update charts
     function updateCharts(history) {
-        if (!history || !history.loss) return;
+        console.log('updateCharts called with history:', history);
+
+        if (!history || !history.loss) {
+            console.warn('No history or loss data available');
+            return;
+        }
 
         // Update loss chart
         if (lossChart) {
@@ -244,14 +268,38 @@
             lossChart.data.labels = epochs;
             lossChart.data.datasets[0].data = history.loss;
             lossChart.update();
+            console.log('Loss chart updated with', history.loss.length, 'data points');
+        } else {
+            console.warn('lossChart not initialized');
         }
 
         // Update accuracy chart if accuracy data exists
-        if (accuracyChart && history.accuracy) {
-            const epochs = history.accuracy.map((_, i) => i + 1);
-            accuracyChart.data.labels = epochs;
-            accuracyChart.data.datasets[0].data = history.accuracy.map(acc => acc * 100);
-            accuracyChart.update();
+        if (accuracyChart) {
+            if (history.accuracy && history.accuracy.length > 0) {
+                const epochs = history.accuracy.map((_, i) => i + 1);
+                accuracyChart.data.labels = epochs;
+                accuracyChart.data.datasets[0].data = history.accuracy.map(acc => acc * 100);
+                accuracyChart.update();
+                console.log('Accuracy chart updated with', history.accuracy.length, 'data points');
+            } else {
+                // Show message if no accuracy data
+                console.warn('No accuracy data in history');
+                const accuracyCard = document.querySelector('#accuracyChart').closest('.card');
+                if (accuracyCard) {
+                    const alertDiv = document.createElement('div');
+                    alertDiv.className = 'alert alert-info mt-4';
+                    alertDiv.innerHTML = `
+                        <i class="fas fa-info-circle"></i>
+                        <span>Accuracy data not available. This may be expected for regression tasks or if accuracy wasn't calculated during training.</span>
+                    `;
+                    // Check if alert doesn't exist already
+                    if (!accuracyCard.querySelector('.alert')) {
+                        accuracyCard.querySelector('.card-body').appendChild(alertDiv);
+                    }
+                }
+            }
+        } else {
+            console.warn('accuracyChart not initialized');
         }
     }
 

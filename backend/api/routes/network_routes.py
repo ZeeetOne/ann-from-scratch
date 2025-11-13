@@ -43,6 +43,19 @@ def build_network():
     try:
         data = request.json
 
+        print("=" * 60)
+        print("BACKEND: Received build_network request")
+        print("=" * 60)
+        print("Layers:", data.get('layers'))
+        print("\nConnections data:")
+        for conn_layer in data.get('connections', []):
+            layer_idx = conn_layer.get('layer_idx')
+            print(f"\n  Layer {layer_idx}:")
+            print(f"    Connections: {conn_layer.get('connections')}")
+            print(f"    Weights: {conn_layer.get('weights')}")
+            print(f"    Biases: {conn_layer.get('biases')}")
+        print("=" * 60)
+
         # Validate request
         RequestValidator.validate_build_network_request(data)
 
