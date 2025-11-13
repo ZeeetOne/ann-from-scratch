@@ -1,0 +1,44 @@
+<!-- Connection Edit Modal -->
+<dialog id="connectionModal" class="modal">
+    <div class="modal-box">
+        <h3 class="font-bold text-lg mb-4">
+            <i class="fas fa-edit"></i>
+            Edit Connection
+        </h3>
+        <p id="connectionInfo" class="text-sm text-base-content/70 mb-4"></p>
+
+        <div class="space-y-4">
+            <div class="form-control">
+                <label class="label">
+                    <span class="label-text font-semibold">Weight</span>
+                </label>
+                <input type="number" id="modalWeight" step="0.01" class="input input-bordered">
+            </div>
+
+            <div class="form-control">
+                <label class="label">
+                    <span class="label-text font-semibold">Bias</span>
+                </label>
+                <input type="number" id="modalBias" step="0.01" class="input input-bordered">
+            </div>
+        </div>
+
+        <div class="modal-action">
+            <button id="deleteConnectionBtn" class="btn btn-error gap-2">
+                <i class="fas fa-trash"></i>
+                Delete
+            </button>
+            <button id="cancelConnectionBtn" class="btn btn-ghost">Cancel</button>
+            <button id="saveConnectionBtn" class="btn btn-primary gap-2">
+                <i class="fas fa-save"></i>
+                Save
+            </button>
+        </div>
+    </div>
+    <form method="dialog" class="modal-backdrop">
+        <button>close</button>
+    </form>
+</dialog>
+
+<!-- Toast Container -->
+<div class="toast toast-end" id="toastContainer"></div>

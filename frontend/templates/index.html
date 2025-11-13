@@ -1,360 +1,455 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" data-theme="light">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>ANN from Scratch - Interactive Neural Network Builder</title>
-    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+    {% include 'partials/head.html' %}
 </head>
-<body>
-    <div class="container">
-        <header>
-            <h1>🧠 ANN from Scratch</h1>
-            <p>Interactive Neural Network Builder & Predictor</p>
-        </header>
+<body class="bg-base-200 min-h-screen">
 
-        <div class="main-content">
-            <!-- Network Configuration Section -->
-            <section class="config-section">
-                <h2 class="section-header" onclick="toggleSection('section1')">
-                    <span class="section-icon">▼</span>
-                    1. Build Network Architecture
-                </h2>
+    {% include 'partials/navbar.html' %}
 
-                <div id="section1" class="section-content">
-                <div class="quick-start">
-                    <button id="quickStartMultiClassBtn" class="btn btn-secondary">📊 Multi-Class Example (3-4-2 Softmax)</button>
-                    <button id="quickStartBinaryBtn" class="btn btn-secondary">🎯 Binary Example (3-4-1 Sigmoid)</button>
-                    <button id="resetNetworkBtn" class="btn btn-secondary">Reset to 1-1-1</button>
-                </div>
+    {% include 'partials/hero.html' %}
 
-                <!-- Interactive Network Builder -->
-                <div id="networkBuilder" class="network-builder">
-                    <div class="builder-header">
-                        <h3>Interactive Network Builder</h3>
-                        <p class="builder-help">
-                            • Use +/- buttons to add/remove nodes in each layer<br>
-                            • Drag from one node to another to create a connection<br>
-                            • Click on a connection line to edit weight and bias<br>
-                            • Right-click on a connection to delete it
-                        </p>
+    <!-- Main Content -->
+    <div class="container mx-auto px-4 pb-12 max-w-7xl">
+
+        {% include 'partials/steps.html' %}
+
+        <!-- Tab Navigation -->
+        <div role="tablist" class="tabs tabs-lifted tabs-lg mb-4">
+
+            <!-- Tab 1: Build Network -->
+            <input type="radio" name="main_tabs" role="tab" class="tab" aria-label="Build Network" checked />
+            <div role="tabpanel" class="tab-content bg-base-100 border-base-300 rounded-box p-6">
+                <div id="build" class="space-y-6">
+                    <div class="flex items-center justify-between mb-6">
+                        <div>
+                            <h2 class="text-3xl font-bold flex items-center gap-3">
+                                <i class="fas fa-network-wired text-purple-600"></i>
+                                Build Network Architecture
+                            </h2>
+                            <p class="text-base-content/70 mt-2">Design your neural network by configuring layers and connections</p>
+                        </div>
                     </div>
 
-                    <!-- Layer Controls -->
-                    <div class="layer-controls">
-                        <div class="layer-control-group">
-                            <h4>Input Layer</h4>
-                            <div class="node-counter">
-                                <button id="inputLayerMinus" class="btn-counter">−</button>
-                                <span id="inputLayerCount">1</span>
-                                <button id="inputLayerPlus" class="btn-counter">+</button>
+                    <!-- Quick Start Examples -->
+                    <div class="card bg-gradient-to-r from-purple-500/10 to-pink-500/10 border border-purple-200">
+                        <div class="card-body">
+                            <h3 class="card-title text-lg">
+                                <i class="fas fa-rocket text-purple-600"></i>
+                                Quick Start Examples
+                            </h3>
+                            <div class="flex flex-wrap gap-3 mt-4">
+                                <button id="quickStartBinaryBtn" class="btn btn-outline btn-primary gap-2">
+                                    <i class="fas fa-circle-dot"></i>
+                                    Binary Classification (3-4-1)
+                                </button>
+                                <button id="quickStartMultiClassBtn" class="btn btn-outline btn-secondary gap-2">
+                                    <i class="fas fa-layer-group"></i>
+                                    Multi-Class (3-4-2 Softmax)
+                                </button>
+                                <button id="resetNetworkBtn" class="btn btn-outline btn-ghost gap-2">
+                                    <i class="fas fa-rotate-right"></i>
+                                    Reset to 1-1-1
+                                </button>
                             </div>
-                            <select id="inputActivation" class="activation-select-mini">
-                                <option value="linear" selected>Linear</option>
-                            </select>
                         </div>
+                    </div>
 
-                        <div class="layer-control-group">
-                            <h4>Hidden Layers</h4>
-                            <div id="hiddenLayersControls">
-                                <div class="hidden-layer-item" data-layer-index="1">
-                                    <div class="hidden-layer-header">
-                                        <span class="layer-label">Layer 1:</span>
-                                        <div class="node-counter">
-                                            <button class="btn-counter hidden-minus" data-layer="1">−</button>
-                                            <span class="hidden-count" data-layer="1">1</span>
-                                            <button class="btn-counter hidden-plus" data-layer="1">+</button>
-                                        </div>
-                                        <button class="btn-remove-layer" data-layer="1">✕</button>
-                                    </div>
-                                    <select class="activation-select-mini hidden-activation" data-layer="1">
-                                        <option value="sigmoid" selected>Sigmoid</option>
-                                        <option value="relu">ReLU</option>
-                                        <option value="threshold">Threshold</option>
-                                        <option value="softmax">Softmax</option>
-                                    </select>
+                    <!-- Interactive Network Builder -->
+                    <div class="card bg-base-100 shadow-xl">
+                        <div class="card-body">
+                            <h3 class="card-title text-xl mb-4">
+                                <i class="fas fa-sliders text-blue-600"></i>
+                                Interactive Network Builder
+                            </h3>
+
+                            <div class="alert alert-info mb-4">
+                                <i class="fas fa-info-circle"></i>
+                                <div>
+                                    <p class="font-semibold">How to build your network:</p>
+                                    <ul class="list-disc list-inside text-sm mt-2">
+                                        <li>Use +/- buttons to add/remove nodes in each layer</li>
+                                        <li>Drag from one node to another to create a connection</li>
+                                        <li>Click on a connection line to edit weight and bias</li>
+                                        <li>Right-click on a connection to delete it</li>
+                                    </ul>
                                 </div>
                             </div>
-                            <button id="addHiddenLayerBtn" class="btn btn-sm btn-primary">+ Add Hidden Layer</button>
-                        </div>
 
-                        <div class="layer-control-group">
-                            <h4>Output Layer</h4>
-                            <div class="node-counter">
-                                <button id="outputLayerMinus" class="btn-counter">−</button>
-                                <span id="outputLayerCount">1</span>
-                                <button id="outputLayerPlus" class="btn-counter">+</button>
+                            <!-- Layer Controls Grid -->
+                            <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
+                                <!-- Input Layer -->
+                                <div class="card bg-blue-50 border-2 border-blue-200">
+                                    <div class="card-body p-4">
+                                        <h4 class="font-bold text-blue-700 mb-3 flex items-center gap-2">
+                                            <i class="fas fa-right-to-bracket"></i>
+                                            Input Layer
+                                        </h4>
+                                        <div class="flex items-center justify-center gap-3 mb-3">
+                                            <button id="inputLayerMinus" class="btn btn-circle btn-sm btn-outline">
+                                                <i class="fas fa-minus"></i>
+                                            </button>
+                                            <div class="badge badge-lg badge-primary text-xl font-bold px-6">
+                                                <span id="inputLayerCount">1</span>
+                                            </div>
+                                            <button id="inputLayerPlus" class="btn btn-circle btn-sm btn-outline">
+                                                <i class="fas fa-plus"></i>
+                                            </button>
+                                        </div>
+                                        <select id="inputActivation" class="select select-bordered select-sm w-full">
+                                            <option value="linear" selected>Linear</option>
+                                        </select>
+                                    </div>
+                                </div>
+
+                                <!-- Hidden Layers -->
+                                <div class="card bg-purple-50 border-2 border-purple-200">
+                                    <div class="card-body p-4">
+                                        <h4 class="font-bold text-purple-700 mb-3 flex items-center gap-2">
+                                            <i class="fas fa-layer-group"></i>
+                                            Hidden Layers
+                                        </h4>
+                                        <div id="hiddenLayersControls" class="space-y-3">
+                                            <div class="hidden-layer-item" data-layer-index="1">
+                                                <div class="flex items-center justify-between mb-2">
+                                                    <span class="text-sm font-semibold">Layer 1:</span>
+                                                    <button class="btn btn-circle btn-xs btn-error btn-remove-layer" data-layer="1">
+                                                        <i class="fas fa-times"></i>
+                                                    </button>
+                                                </div>
+                                                <div class="flex items-center justify-center gap-2 mb-2">
+                                                    <button class="btn btn-circle btn-sm btn-outline hidden-minus" data-layer="1">
+                                                        <i class="fas fa-minus"></i>
+                                                    </button>
+                                                    <div class="badge badge-lg badge-secondary text-xl font-bold px-4">
+                                                        <span class="hidden-count" data-layer="1">1</span>
+                                                    </div>
+                                                    <button class="btn btn-circle btn-sm btn-outline hidden-plus" data-layer="1">
+                                                        <i class="fas fa-plus"></i>
+                                                    </button>
+                                                </div>
+                                                <select class="select select-bordered select-sm w-full hidden-activation" data-layer="1">
+                                                    <option value="sigmoid" selected>Sigmoid</option>
+                                                    <option value="relu">ReLU</option>
+                                                    <option value="threshold">Threshold</option>
+                                                    <option value="softmax">Softmax</option>
+                                                </select>
+                                            </div>
+                                        </div>
+                                        <button id="addHiddenLayerBtn" class="btn btn-sm btn-primary w-full mt-3 gap-2">
+                                            <i class="fas fa-plus"></i>
+                                            Add Hidden Layer
+                                        </button>
+                                    </div>
+                                </div>
+
+                                <!-- Output Layer -->
+                                <div class="card bg-green-50 border-2 border-green-200">
+                                    <div class="card-body p-4">
+                                        <h4 class="font-bold text-green-700 mb-3 flex items-center gap-2">
+                                            <i class="fas fa-right-from-bracket"></i>
+                                            Output Layer
+                                        </h4>
+                                        <div class="flex items-center justify-center gap-3 mb-3">
+                                            <button id="outputLayerMinus" class="btn btn-circle btn-sm btn-outline">
+                                                <i class="fas fa-minus"></i>
+                                            </button>
+                                            <div class="badge badge-lg badge-success text-xl font-bold px-6">
+                                                <span id="outputLayerCount">1</span>
+                                            </div>
+                                            <button id="outputLayerPlus" class="btn btn-circle btn-sm btn-outline">
+                                                <i class="fas fa-plus"></i>
+                                            </button>
+                                        </div>
+                                        <select id="outputActivation" class="select select-bordered select-sm w-full">
+                                            <option value="sigmoid" selected>Sigmoid</option>
+                                            <option value="relu">ReLU</option>
+                                            <option value="threshold">Threshold</option>
+                                            <option value="linear">Linear</option>
+                                            <option value="softmax">Softmax</option>
+                                        </select>
+                                    </div>
+                                </div>
                             </div>
-                            <select id="outputActivation" class="activation-select-mini">
-                                <option value="sigmoid" selected>Sigmoid</option>
-                                <option value="relu">ReLU</option>
-                                <option value="threshold">Threshold</option>
-                                <option value="linear">Linear</option>
-                                <option value="softmax">Softmax</option>
-                            </select>
+
+                            <!-- Visual Canvas -->
+                            <div class="card bg-base-200">
+                                <div class="card-body">
+                                    <div id="networkCanvas" class="network-canvas min-h-[400px] rounded-lg"></div>
+
+                                    <!-- Legend -->
+                                    <div class="flex flex-wrap gap-4 justify-center mt-4 text-sm">
+                                        <div class="flex items-center gap-2">
+                                            <div class="w-4 h-4 rounded-full bg-blue-500"></div>
+                                            <span>Input Layer</span>
+                                        </div>
+                                        <div class="flex items-center gap-2">
+                                            <div class="w-4 h-4 rounded-full bg-purple-500"></div>
+                                            <span>Hidden Layer</span>
+                                        </div>
+                                        <div class="flex items-center gap-2">
+                                            <div class="w-4 h-4 rounded-full bg-green-500"></div>
+                                            <span>Output Layer</span>
+                                        </div>
+                                        <div class="flex items-center gap-2">
+                                            <div class="w-8 h-0.5 bg-gray-400"></div>
+                                            <span>Connection</span>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Build Button -->
+                            <div class="card-actions justify-end mt-6">
+                                <button id="buildNetworkBtn" class="btn btn-success btn-lg gap-2">
+                                    <i class="fas fa-hammer"></i>
+                                    Build Neural Network
+                                </button>
+                            </div>
+
+                            <div id="networkSummary" class="mt-6"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Tab 2: Dataset -->
+            <input type="radio" name="main_tabs" role="tab" class="tab" aria-label="Dataset" />
+            <div role="tabpanel" class="tab-content bg-base-100 border-base-300 rounded-box p-6">
+                <div id="dataset" class="space-y-6">
+                    <h2 class="text-3xl font-bold flex items-center gap-3 mb-6">
+                        <i class="fas fa-database text-blue-600"></i>
+                        Input Dataset
+                    </h2>
+
+                    <div class="alert alert-warning">
+                        <i class="fas fa-exclamation-triangle"></i>
+                        <div>
+                            <p class="font-semibold">Dataset Format Requirements:</p>
+                            <p class="text-sm mt-1">
+                                Input columns: <code class="bg-base-300 px-2 py-1 rounded">x1, x2, x3, ...</code>
+                                Output columns: <code class="bg-base-300 px-2 py-1 rounded">y1, y2, y3, ...</code>
+                            </p>
+                            <p class="text-sm mt-1" id="datasetRequirement"></p>
                         </div>
                     </div>
 
-                    <!-- Visual Canvas -->
-                    <div id="networkCanvas" class="network-canvas"></div>
-
-                    <div class="diagram-legend">
-                        <span class="legend-item"><span class="legend-circle input-node"></span> Input Layer</span>
-                        <span class="legend-item"><span class="legend-circle hidden-node"></span> Hidden Layer</span>
-                        <span class="legend-item"><span class="legend-circle output-node"></span> Output Layer</span>
-                        <span class="legend-item"><span class="legend-line"></span> Connection (drag to create)</span>
-                    </div>
-                </div>
-
-                <div class="form-actions">
-                    <button id="buildNetworkBtn" class="btn btn-success">Build Neural Network</button>
-                </div>
-
-                <div id="networkSummary" class="network-summary"></div>
-                </div>
-            </section>
-
-            <!-- Dataset Section -->
-            <section class="dataset-section">
-                <h2 class="section-header" onclick="toggleSection('section2')">
-                    <span class="section-icon">▼</span>
-                    2. Input Dataset
-                </h2>
-
-                <div id="section2" class="section-content">
-
-                <div class="dataset-info">
-                    <p class="info-text">
-                        📋 <strong>Dataset Format:</strong> Input columns must be named <code>x1, x2, x3, ...</code> and output columns <code>y1, y2, y3, ...</code><br>
-                        <span id="datasetRequirement"></span>
-                    </p>
-                </div>
-
-                <div class="dataset-options">
-                    <button id="loadExampleBtn" class="btn btn-secondary">Load Example Dataset</button>
-                </div>
-
-                <!-- Drag & Drop Zone -->
-                <div id="dropZone" class="drop-zone">
-                    <div class="drop-zone-content">
-                        <span class="drop-icon">📁</span>
-                        <p class="drop-text">Drag & Drop CSV file here</p>
-                        <p class="drop-subtext">or</p>
-                        <label for="fileInput" class="btn btn-primary">Browse Files</label>
-                        <input type="file" id="fileInput" accept=".csv" style="display: none;">
-                    </div>
-                </div>
-
-                <div class="form-group">
-                    <label>Dataset Preview:</label>
-                    <div id="datasetValidation" class="validation-message"></div>
-                    <textarea id="datasetInput" class="form-control dataset-textarea" placeholder="x1,x2,x3,y1,y2
-25,1010,85,1,0
-30,1015,45,0,1
-22,1005,90,1,0
-28,1012,50,0,1
-20,1000,95,1,0"></textarea>
-                    <div class="dataset-stats" id="datasetStats"></div>
-                </div>
-                </div>
-            </section>
-
-            <!-- Forward Pass Section -->
-            <section class="forward-pass-section">
-                <h2 class="section-header" onclick="toggleSection('section3')">
-                    <span class="section-icon">▼</span>
-                    3. Forward Pass
-                </h2>
-
-                <div id="section3" class="section-content">
-                <p class="section-description">See how data flows through the network layers to produce predictions</p>
-
-                <div class="form-actions">
-                    <button id="forwardPassBtn" class="btn btn-primary">Run Forward Pass</button>
-                </div>
-
-                <div id="forwardPassSummary" class="forward-pass-summary" style="display:none;"></div>
-                <div id="forwardPassContainer" class="forward-pass-container"></div>
-                </div>
-            </section>
-
-            <!-- Loss Function Section -->
-            <section class="loss-section">
-                <h2 class="section-header" onclick="toggleSection('section4')">
-                    <span class="section-icon">▼</span>
-                    4. Loss Function
-                </h2>
-
-                <div id="section4" class="section-content">
-                <p class="section-description">Calculate loss by comparing predictions (ŷ) with targets (Y)</p>
-
-                <!-- Classification Type Info -->
-                <div id="classificationInfo" class="info-box" style="display:none;">
-                    <strong>ℹ️ Classification Type:</strong> <span id="classificationType"></span><br>
-                    <strong>📋 Recommended Loss:</strong> <span id="recommendedLoss"></span>
-                </div>
-
-                <div class="form-group">
-                    <label>Select Loss Function:</label>
-                    <select id="lossFunctionSelect" class="form-control">
-                        <option value="mse">Mean Squared Error (MSE)</option>
-                        <option value="binary">Binary Cross-Entropy (BCE)</option>
-                        <option value="categorical">Categorical Cross-Entropy (CCE)</option>
-                    </select>
-                </div>
-
-                <div class="form-actions">
-                    <button id="calculateLossBtn" class="btn btn-primary">Calculate Loss</button>
-                </div>
-
-                <div id="lossContainer" class="loss-container"></div>
-                </div>
-            </section>
-
-            <!-- Update Weights Section -->
-            <section class="update-weights-section">
-                <h2 class="section-header" onclick="toggleSection('section5')">
-                    <span class="section-icon">▼</span>
-                    5. Update Weights (Optimizer)
-                </h2>
-
-                <div id="section5" class="section-content">
-                <p class="section-description">Update network weights based on gradients - this completes <strong>1 EPOCH</strong></p>
-                <div class="info-box">
-                    <strong>📚 What is 1 Epoch?</strong><br>
-                    1 Epoch = Forward Pass → Loss Calculation → Backpropagation → Weight Update<br>
-                    This is one complete cycle through all training samples.
-                </div>
-
-                <div class="form-row">
-                    <div class="form-group">
-                        <label>Optimizer:</label>
-                        <select id="updateOptimizer" class="form-control">
-                            <option value="gd">Gradient Descent (GD) - Full batch</option>
-                            <option value="sgd">Stochastic Gradient Descent (SGD) - Per sample</option>
-                        </select>
+                    <div class="flex gap-3">
+                        <button id="loadExampleBtn" class="btn btn-primary gap-2">
+                            <i class="fas fa-file-import"></i>
+                            Load Example Dataset
+                        </button>
+                        <button id="generateRandomBtn" class="btn btn-secondary gap-2">
+                            <i class="fas fa-dice"></i>
+                            Generate Random Dataset
+                        </button>
                     </div>
 
-                    <div class="form-group">
-                        <label>Learning Rate (α):</label>
-                        <input type="number" id="updateLearningRate" min="0.001" max="10" step="0.01" value="0.1" class="form-control">
-                    </div>
-                </div>
-
-                <div class="form-actions">
-                    <button id="updateWeightsBtn" class="btn btn-primary">Update Weights (1 Epoch)</button>
-                </div>
-
-                <div id="updateWeightsContainer" class="update-weights-container"></div>
-                </div>
-            </section>
-
-            <!-- Automated Training Section -->
-            <section class="training-section">
-                <h2 class="section-header" onclick="toggleSection('section6')">
-                    <span class="section-icon">▼</span>
-                    6. Automated Training (Multiple Epochs)
-                </h2>
-
-                <div id="section6" class="section-content">
-                <p class="section-description">Automate the training process for multiple epochs to achieve better predictions</p>
-                <div class="info-box">
-                    <strong>🎯 Automated Training</strong><br>
-                    This will repeat the entire process (Forward → Loss → Backprop → Update) for many epochs until the model converges.
-                </div>
-
-                <div class="training-config">
-                    <div class="form-row">
-                        <div class="form-group">
-                            <label>Optimizer:</label>
-                            <select id="optimizer" class="form-control">
-                                <option value="gd">Gradient Descent (GD)</option>
-                                <option value="sgd">Stochastic Gradient Descent (SGD)</option>
-                            </select>
-                        </div>
-
-                        <div class="form-group">
-                            <label>Learning Rate:</label>
-                            <input type="number" id="learningRate" min="0.001" max="10" step="0.01" value="0.5" class="form-control">
+                    <div id="dropZone" class="card bg-base-200 border-2 border-dashed border-base-300 hover:border-primary hover:bg-primary/5 cursor-pointer transition-all">
+                        <div class="card-body items-center text-center py-12">
+                            <i class="fas fa-cloud-upload-alt text-6xl text-base-content/30 mb-4"></i>
+                            <h3 class="text-xl font-bold mb-2">Drag & Drop CSV File</h3>
+                            <p class="text-base-content/60 mb-4">or</p>
+                            <label for="fileInput" class="btn btn-primary gap-2">
+                                <i class="fas fa-folder-open"></i>
+                                Browse Files
+                            </label>
+                            <input type="file" id="fileInput" accept=".csv" class="hidden">
                         </div>
                     </div>
 
-                    <div class="form-row">
-                        <div class="form-group">
-                            <label>Epochs:</label>
-                            <input type="number" id="epochs" min="10" max="10000" step="10" value="1000" class="form-control">
-                        </div>
-
-                        <div class="form-group" id="batchSizeGroup">
-                            <label>Batch Size (for SGD, blank = full batch):</label>
-                            <input type="number" id="batchSize" min="1" step="1" placeholder="Full batch" class="form-control">
+                    <div class="card bg-base-100 shadow-xl">
+                        <div class="card-body">
+                            <h3 class="card-title"><i class="fas fa-table"></i> Dataset Preview</h3>
+                            <div id="datasetValidation" class="mb-3"></div>
+                            <textarea id="datasetInput" class="textarea textarea-bordered h-64 font-mono text-sm"
+                                      placeholder="x1,x2,x3,y1,y2&#10;25,1010,85,1,0&#10;30,1015,45,0,1"></textarea>
+                            <div id="datasetStats" class="stats stats-vertical lg:stats-horizontal shadow mt-4"></div>
                         </div>
                     </div>
+                </div>
+            </div>
 
-                    <div class="form-actions">
-                        <button id="trainBtn" class="btn btn-primary">Start Training</button>
-                        <button id="stopTrainingBtn" class="btn btn-danger" style="display:none;">Stop Training</button>
+            <!-- Tab 3: Train -->
+            <input type="radio" name="main_tabs" role="tab" class="tab" aria-label="Train" />
+            <div role="tabpanel" class="tab-content bg-base-100 border-base-300 rounded-box p-6">
+                <div id="train" class="space-y-6">
+                    <h2 class="text-3xl font-bold flex items-center gap-3 mb-6">
+                        <i class="fas fa-rocket text-orange-600"></i>
+                        Train Neural Network
+                    </h2>
+
+                    <div class="card bg-base-100 shadow-xl">
+                        <div class="card-body">
+                            <h3 class="card-title mb-4"><i class="fas fa-cog"></i> Training Configuration</h3>
+
+                            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                <div class="form-control">
+                                    <label class="label">
+                                        <span class="label-text font-semibold"><i class="fas fa-brain mr-2"></i>Optimizer</span>
+                                    </label>
+                                    <select id="optimizer" class="select select-bordered">
+                                        <option value="gd">Gradient Descent (GD)</option>
+                                        <option value="sgd">Stochastic Gradient Descent (SGD)</option>
+                                        <option value="momentum">Momentum</option>
+                                    </select>
+                                </div>
+
+                                <div class="form-control">
+                                    <label class="label">
+                                        <span class="label-text font-semibold"><i class="fas fa-tachometer-alt mr-2"></i>Learning Rate</span>
+                                    </label>
+                                    <input type="number" id="learningRate" min="0.001" max="10" step="0.01" value="0.5" class="input input-bordered">
+                                </div>
+
+                                <div class="form-control">
+                                    <label class="label">
+                                        <span class="label-text font-semibold"><i class="fas fa-repeat mr-2"></i>Epochs</span>
+                                    </label>
+                                    <input type="number" id="epochs" min="10" max="10000" step="10" value="1000" class="input input-bordered">
+                                </div>
+
+                                <div class="form-control" id="batchSizeGroup">
+                                    <label class="label">
+                                        <span class="label-text font-semibold"><i class="fas fa-layer-group mr-2"></i>Batch Size</span>
+                                    </label>
+                                    <input type="number" id="batchSize" min="1" step="1" placeholder="Full batch" class="input input-bordered">
+                                </div>
+
+                                <div class="form-control">
+                                    <label class="label">
+                                        <span class="label-text font-semibold"><i class="fas fa-chart-line mr-2"></i>Loss Function</span>
+                                    </label>
+                                    <select id="lossFunctionSelect" class="select select-bordered">
+                                        <option value="mse">Mean Squared Error (MSE)</option>
+                                        <option value="binary">Binary Cross-Entropy (BCE)</option>
+                                        <option value="categorical">Categorical Cross-Entropy (CCE)</option>
+                                    </select>
+                                    <div id="classificationInfo" class="alert alert-info mt-2 text-sm hidden">
+                                        <div>
+                                            <p><strong>Type:</strong> <span id="classificationType"></span></p>
+                                            <p><strong>Recommended:</strong> <span id="recommendedLoss"></span></p>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="card-actions justify-end mt-6 gap-3">
+                                <button id="forwardPassBtn" class="btn btn-info gap-2">
+                                    <i class="fas fa-arrow-right"></i> Forward Pass Only
+                                </button>
+                                <button id="calculateLossBtn" class="btn btn-warning gap-2">
+                                    <i class="fas fa-calculator"></i> Calculate Loss
+                                </button>
+                                <button id="trainBtn" class="btn btn-success btn-lg gap-2">
+                                    <i class="fas fa-play"></i> Start Training
+                                </button>
+                                <button id="stopTrainingBtn" class="btn btn-error gap-2 hidden">
+                                    <i class="fas fa-stop"></i> Stop Training
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Training Progress -->
+                    <div id="trainingProgress" class="card bg-base-100 shadow-xl hidden">
+                        <div class="card-body">
+                            <h3 class="card-title"><i class="fas fa-spinner fa-spin"></i> Training in Progress</h3>
+                            <div class="space-y-4">
+                                <div>
+                                    <div class="flex justify-between text-sm mb-2">
+                                        <span>Progress</span>
+                                        <span id="progressText">0%</span>
+                                    </div>
+                                    <progress id="progressBarFill" class="progress progress-success w-full" value="0" max="100"></progress>
+                                </div>
+
+                                <div class="stats stats-vertical lg:stats-horizontal shadow w-full">
+                                    <div class="stat">
+                                        <div class="stat-figure text-primary"><i class="fas fa-repeat text-2xl"></i></div>
+                                        <div class="stat-title">Current Epoch</div>
+                                        <div class="stat-value text-primary" id="currentEpoch">0</div>
+                                    </div>
+                                    <div class="stat">
+                                        <div class="stat-figure text-secondary"><i class="fas fa-chart-line text-2xl"></i></div>
+                                        <div class="stat-title">Current Loss</div>
+                                        <div class="stat-value text-secondary" id="currentLoss">-</div>
+                                    </div>
+                                    <div class="stat">
+                                        <div class="stat-figure text-accent"><i class="fas fa-bullseye text-2xl"></i></div>
+                                        <div class="stat-title">Accuracy</div>
+                                        <div class="stat-value text-accent" id="currentAccuracy">-</div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div id="trainingResults" class="space-y-6"></div>
+                    <div id="forwardPassSummary" class="hidden"></div>
+                    <div id="forwardPassContainer" class="space-y-4"></div>
+                    <div id="lossContainer" class="space-y-4"></div>
+                    <div id="updateWeightsContainer" class="space-y-4"></div>
+                </div>
+            </div>
+
+            <!-- Tab 4: Results -->
+            <input type="radio" name="main_tabs" role="tab" class="tab" aria-label="Results" />
+            <div role="tabpanel" class="tab-content bg-base-100 border-base-300 rounded-box p-6">
+                <div id="results" class="space-y-6">
+                    <h2 class="text-3xl font-bold flex items-center gap-3 mb-6">
+                        <i class="fas fa-chart-bar text-green-600"></i>
+                        Training Results & Visualization
+                    </h2>
+
+                    <!-- Loss Chart -->
+                    <div class="card bg-base-100 shadow-xl">
+                        <div class="card-body">
+                            <h3 class="card-title">
+                                <i class="fas fa-chart-line text-blue-600"></i>
+                                Training Loss Curve
+                            </h3>
+                            <div class="chart-container">
+                                <canvas id="lossChart"></canvas>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Accuracy Chart -->
+                    <div class="card bg-base-100 shadow-xl">
+                        <div class="card-body">
+                            <h3 class="card-title">
+                                <i class="fas fa-chart-area text-green-600"></i>
+                                Accuracy Progress
+                            </h3>
+                            <div class="chart-container">
+                                <canvas id="accuracyChart"></canvas>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Model Evaluation -->
+                    <div id="evaluationResultsSection" class="card bg-base-100 shadow-xl hidden">
+                        <div class="card-body">
+                            <h3 class="card-title">
+                                <i class="fas fa-clipboard-check text-purple-600"></i>
+                                Model Evaluation
+                            </h3>
+                            <div id="evaluationResults"></div>
+                        </div>
                     </div>
                 </div>
+            </div>
 
-                <div id="trainingProgress" class="training-progress" style="display:none;">
-                    <h3>Training Progress</h3>
-                    <div class="progress-bar">
-                        <div id="progressBarFill" class="progress-bar-fill"></div>
-                    </div>
-                    <p id="progressText">Training in progress...</p>
-                </div>
-
-                <div id="trainingResults" class="training-results"></div>
-                </div>
-            </section>
-
-            <!-- Model Evaluation Section -->
-            <section class="evaluation-results-section" id="evaluationResultsSection" style="display:none;">
-                <h2 class="section-header" onclick="toggleSection('section7')">
-                    <span class="section-icon">▼</span>
-                    7. Model Evaluation
-                </h2>
-
-                <div id="section7" class="section-content">
-                <p class="section-description">Comprehensive evaluation of trained model performance</p>
-                <div id="evaluationResults" class="evaluation-results"></div>
-                </div>
-            </section>
         </div>
 
-        <footer>
-            <p>ANN from Scratch - Built with Python & Flask</p>
-        </footer>
     </div>
 
-    <!-- Connection Edit Modal -->
-    <div id="connectionModal" class="modal">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h3>Edit Connection</h3>
-                <span class="modal-close">&times;</span>
-            </div>
-            <div class="modal-body">
-                <p id="connectionInfo" class="connection-info"></p>
-                <div class="form-group">
-                    <label>Weight:</label>
-                    <input type="number" id="modalWeight" step="0.01" class="form-control">
-                </div>
-                <div class="form-group">
-                    <label>Bias:</label>
-                    <input type="number" id="modalBias" step="0.01" class="form-control">
-                </div>
-            </div>
-            <div class="modal-footer">
-                <button id="saveConnectionBtn" class="btn btn-primary">Save</button>
-                <button id="deleteConnectionBtn" class="btn btn-danger">Delete Connection</button>
-                <button id="cancelConnectionBtn" class="btn btn-secondary">Cancel</button>
-            </div>
-        </div>
-    </div>
+    {% include 'partials/modal.html' %}
 
-    <script src="{{ url_for('static', filename='js/network-builder.js') }}"></script>
-    <script src="{{ url_for('static', filename='js/app.js') }}"></script>
+    {% include 'partials/footer.html' %}
+
+    {% include 'partials/scripts.html' %}
+
 </body>
 </html>

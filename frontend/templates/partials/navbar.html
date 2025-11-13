@@ -1,0 +1,55 @@
+<div class="navbar bg-base-100 shadow-lg sticky top-0 z-50">
+    <div class="navbar-start">
+        <div class="dropdown">
+            <label tabindex="0" class="btn btn-ghost lg:hidden">
+                <i class="fas fa-bars text-xl"></i>
+            </label>
+            <ul tabindex="0" class="menu menu-sm dropdown-content mt-3 z-[1] p-2 shadow bg-base-100 rounded-box w-52">
+                <li><a href="#build"><i class="fas fa-network-wired mr-2"></i>Build Network</a></li>
+                <li><a href="#dataset"><i class="fas fa-database mr-2"></i>Dataset</a></li>
+                <li><a href="#train"><i class="fas fa-rocket mr-2"></i>Train</a></li>
+                <li><a href="#results"><i class="fas fa-chart-line mr-2"></i>Results</a></li>
+            </ul>
+        </div>
+        <a class="btn btn-ghost normal-case text-xl">
+            <i class="fas fa-brain text-purple-600 mr-2"></i>
+            <span class="hidden sm:inline gradient-text font-bold">ANN from Scratch</span>
+            <span class="sm:hidden gradient-text font-bold">ANN</span>
+        </a>
+    </div>
+
+    <div class="navbar-center hidden lg:flex">
+        <ul class="menu menu-horizontal px-1">
+            <li><a href="#build" class="tooltip tooltip-bottom" data-tip="Build Network">
+                <i class="fas fa-network-wired"></i>
+                <span class="ml-2">Build</span>
+            </a></li>
+            <li><a href="#dataset" class="tooltip tooltip-bottom" data-tip="Input Dataset">
+                <i class="fas fa-database"></i>
+                <span class="ml-2">Dataset</span>
+            </a></li>
+            <li><a href="#train" class="tooltip tooltip-bottom" data-tip="Train Network">
+                <i class="fas fa-rocket"></i>
+                <span class="ml-2">Train</span>
+            </a></li>
+            <li><a href="#results" class="tooltip tooltip-bottom" data-tip="View Results">
+                <i class="fas fa-chart-line"></i>
+                <span class="ml-2">Results</span>
+            </a></li>
+        </ul>
+    </div>
+
+    <div class="navbar-end gap-2">
+        <!-- Theme Toggle -->
+        <label class="swap swap-rotate btn btn-ghost btn-circle">
+            <input type="checkbox" id="themeToggle" />
+            <i class="fas fa-sun swap-on text-xl"></i>
+            <i class="fas fa-moon swap-off text-xl"></i>
+        </label>
+
+        <!-- GitHub Link -->
+        <a href="https://github.com" target="_blank" class="btn btn-ghost btn-circle">
+            <i class="fab fa-github text-xl"></i>
+        </a>
+    </div>
+</div>

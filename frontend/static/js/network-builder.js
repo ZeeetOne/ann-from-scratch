@@ -473,43 +473,37 @@ class InteractiveNetworkBuilder {
         weightInput.value = conn.weight.toFixed(3);
         biasInput.value = conn.bias.toFixed(3);
 
-        modal.style.display = 'block';
+        // Show modal (DaisyUI uses showModal() for <dialog> elements)
+        modal.showModal();
 
         // Save button
         const saveBtn = document.getElementById('saveConnectionBtn');
         const deleteBtn = document.getElementById('deleteConnectionBtn');
         const cancelBtn = document.getElementById('cancelConnectionBtn');
-        const closeBtn = modal.querySelector('.modal-close');
 
         // Remove old listeners
         const newSaveBtn = saveBtn.cloneNode(true);
         const newDeleteBtn = deleteBtn.cloneNode(true);
         const newCancelBtn = cancelBtn.cloneNode(true);
-        const newCloseBtn = closeBtn.cloneNode(true);
 
         saveBtn.parentNode.replaceChild(newSaveBtn, saveBtn);
         deleteBtn.parentNode.replaceChild(newDeleteBtn, deleteBtn);
         cancelBtn.parentNode.replaceChild(newCancelBtn, cancelBtn);
-        closeBtn.parentNode.replaceChild(newCloseBtn, closeBtn);
 
         newSaveBtn.addEventListener('click', () => {
             conn.weight = parseFloat(weightInput.value) || 0;
             conn.bias = parseFloat(biasInput.value) || 0;
-            modal.style.display = 'none';
+            modal.close();
             this.render();
         });
 
         newDeleteBtn.addEventListener('click', () => {
             this.deleteConnection(connIndex);
-            modal.style.display = 'none';
+            modal.close();
         });
 
         newCancelBtn.addEventListener('click', () => {
-            modal.style.display = 'none';
-        });
-
-        newCloseBtn.addEventListener('click', () => {
-            modal.style.display = 'none';
+            modal.close();
         });
     }
 

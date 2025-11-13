@@ -1,0 +1,214 @@
+<script>
+    // Theme Toggle
+    const themeToggle = document.getElementById('themeToggle');
+    const html = document.documentElement;
+
+    // Load saved theme
+    const savedTheme = localStorage.getItem('theme') || 'light';
+    html.setAttribute('data-theme', savedTheme);
+    themeToggle.checked = savedTheme === 'dark';
+
+    themeToggle.addEventListener('change', (e) => {
+        const theme = e.target.checked ? 'dark' : 'light';
+        html.setAttribute('data-theme', theme);
+        localStorage.setItem('theme', theme);
+    });
+
+    // Toast Notification Function
+    function showToast(message, type = 'info') {
+        const toastContainer = document.getElementById('toastContainer');
+        const iconMap = {
+            'success': 'fa-check-circle',
+            'error': 'fa-exclamation-circle',
+            'info': 'fa-info-circle',
+            'warning': 'fa-exclamation-triangle'
+        };
+
+        const toast = document.createElement('div');
+        toast.className = `alert alert-${type} shadow-lg`;
+        toast.innerHTML = `
+            <div>
+                <i class="fas ${iconMap[type]}"></i>
+                <span>${message}</span>
+            </div>
+        `;
+
+        toastContainer.appendChild(toast);
+
+        setTimeout(() => {
+            toast.style.opacity = '0';
+            setTimeout(() => toast.remove(), 300);
+        }, 3000);
+    }
+
+    // Update step progress
+    function updateStep(stepNumber) {
+        for (let i = 1; i <= 6; i++) {
+            const step = document.getElementById(`step${i}`);
+            if (i <= stepNumber) {
+                step.classList.add('step-primary');
+            } else {
+                step.classList.remove('step-primary');
+            }
+        }
+    }
+
+    // Initialize Charts
+    let lossChart = null;
+    let accuracyChart = null;
+
+    function initializeLossChart() {
+        const ctx = document.getElementById('lossChart');
+        if (!ctx) return;
+
+        if (lossChart) {
+            lossChart.destroy();
+        }
+
+        lossChart = new Chart(ctx, {
+            type: 'line',
+            data: {
+                labels: [],
+                datasets: [{
+                    label: 'Training Loss',
+                    data: [],
+                    borderColor: 'rgb(147, 51, 234)',
+                    backgroundColor: 'rgba(147, 51, 234, 0.1)',
+                    tension: 0.4,
+                    fill: true
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: {
+                        display: true,
+                        position: 'top'
+                    }
+                },
+                scales: {
+                    y: {
+                        beginAtZero: true,
+                        title: {
+                            display: true,
+                            text: 'Loss'
+                        }
+                    },
+                    x: {
+                        title: {
+                            display: true,
+                            text: 'Epoch'
+                        }
+                    }
+                }
+            }
+        });
+    }
+
+    function initializeAccuracyChart() {
+        const ctx = document.getElementById('accuracyChart');
+        if (!ctx) return;
+
+        if (accuracyChart) {
+            accuracyChart.destroy();
+        }
+
+        accuracyChart = new Chart(ctx, {
+            type: 'line',
+            data: {
+                labels: [],
+                datasets: [{
+                    label: 'Accuracy',
+                    data: [],
+                    borderColor: 'rgb(34, 197, 94)',
+                    backgroundColor: 'rgba(34, 197, 94, 0.1)',
+                    tension: 0.4,
+                    fill: true
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: {
+                        display: true,
+                        position: 'top'
+                    }
+                },
+                scales: {
+                    y: {
+                        beginAtZero: true,
+                        max: 100,
+                        title: {
+                            display: true,
+                            text: 'Accuracy (%)'
+                        }
+                    },
+                    x: {
+                        title: {
+                            display: true,
+                            text: 'Epoch'
+                        }
+                    }
+                }
+            }
+        });
+    }
+
+    // Initialize charts on page load
+    document.addEventListener('DOMContentLoaded', () => {
+        initializeLossChart();
+        initializeAccuracyChart();
+    });
+
+    // Helper function to update charts
+    function updateCharts(history) {
+        if (!history || !history.loss) return;
+
+        // Update loss chart
+        if (lossChart) {
+            const epochs = history.loss.map((_, i) => i + 1);
+            lossChart.data.labels = epochs;
+            lossChart.data.datasets[0].data = history.loss;
+            lossChart.update();
+        }
+
+        // Update accuracy chart if accuracy data exists
+        if (accuracyChart && history.accuracy) {
+            const epochs = history.accuracy.map((_, i) => i + 1);
+            accuracyChart.data.labels = epochs;
+            accuracyChart.data.datasets[0].data = history.accuracy.map(acc => acc * 100);
+            accuracyChart.update();
+        }
+    }
+
+    // Generate Random Dataset Button
+    const generateRandomBtn = document.getElementById('generateRandomBtn');
+    if (generateRandomBtn) {
+        generateRandomBtn.addEventListener('click', async () => {
+            const numSamples = prompt('Enter number of samples (10-100):', '20');
+            if (!numSamples) return;
+
+            try {
+                const response = await fetch('/generate_random_dataset', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ num_samples: parseInt(numSamples) })
+                });
+
+                const data = await response.json();
+                if (data.success) {
+                    document.getElementById('datasetInput').value = data.dataset;
+                    showToast('Random dataset generated successfully!', 'success');
+                    updateStep(2);
+                }
+            } catch (error) {
+                showToast('Error generating dataset', 'error');
+            }
+        });
+    }
+</script>
+
+<script src="{{ url_for('static', filename='js/network-builder.js') }}"></script>
+<script src="{{ url_for('static', filename='js/app.js') }}"></script>
