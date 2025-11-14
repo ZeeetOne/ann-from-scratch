@@ -35,6 +35,7 @@ buildNetworkBtn.addEventListener('click', buildNetwork);
 quickStartMultiClassBtn.addEventListener('click', quickStartMultiClass);
 quickStartBinaryBtn.addEventListener('click', quickStartBinary);
 loadExampleBtn.addEventListener('click', loadExampleDataset);
+document.getElementById('saveDatasetBtn').addEventListener('click', saveDatasetAndContinue);
 forwardPassBtn.addEventListener('click', runForwardPass);
 calculateLossBtn.addEventListener('click', calculateLoss);
 // backpropBtn.addEventListener('click', runBackpropagation);  // Removed section
@@ -108,19 +109,43 @@ async function buildNetwork() {
         const data = await response.json();
 
         if (data.success) {
-            networkSummary.textContent = data.summary;
+            // Format the network summary in a card with better styling
+            networkSummary.innerHTML = `
+                <div class="card bg-base-100 shadow-xl border-2 border-success">
+                    <div class="card-body">
+                        <h3 class="card-title text-success flex items-center gap-2">
+                            <i class="fas fa-check-circle"></i>
+                            Network Built Successfully!
+                        </h3>
+                        <pre class="bg-base-200 p-4 rounded-lg overflow-x-auto text-sm font-mono leading-relaxed whitespace-pre-wrap">${data.summary}</pre>
+                    </div>
+                </div>
+            `;
             networkSummary.classList.add('show');
 
             // Display classification info and auto-select loss
             displayClassificationInfo(data.classification_type, data.recommended_loss);
 
-            showSuccess('Network built successfully!');
+            showSuccess('Network built successfully! Redirecting to dataset page...');
 
             // Update dataset requirement display
             updateDatasetRequirement();
 
             // Update progress to step 1
             updateStep(1);
+
+            // Redirect to dataset tab after 3 seconds
+            setTimeout(() => {
+                const datasetTab = document.getElementById('tab-dataset');
+                if (datasetTab) {
+                    datasetTab.checked = true;
+                    // Scroll to dataset section
+                    const datasetSection = document.getElementById('dataset');
+                    if (datasetSection) {
+                        datasetSection.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                    }
+                }
+            }, 3000);
         } else {
             showError('Error building network: ' + data.error);
         }
@@ -151,13 +176,22 @@ async function quickStartMultiClass() {
         const data = await response.json();
 
         if (data.success) {
-            networkSummary.textContent = data.summary;
+            // Format the network summary in a card with better styling
+            networkSummary.innerHTML = `
+                <div class="card bg-base-100 shadow-xl border-2 border-success">
+                    <div class="card-body">
+                        <h3 class="card-title text-success flex items-center gap-2">
+                            <i class="fas fa-check-circle"></i>
+                            Network Built Successfully!
+                        </h3>
+                        <pre class="bg-base-200 p-4 rounded-lg overflow-x-auto text-sm font-mono leading-relaxed whitespace-pre-wrap">${data.summary}</pre>
+                    </div>
+                </div>
+            `;
             networkSummary.classList.add('show');
 
             // Display classification info and auto-select loss
             displayClassificationInfo(data.classification_type, data.recommended_loss);
-
-            showSuccess(data.message);
 
             // Load the example network into the interactive builder
             if (data.layers && data.connections) {
@@ -167,17 +201,22 @@ async function quickStartMultiClass() {
             // Update dataset requirement display
             updateDatasetRequirement();
 
-            // Load example dataset from backend response
-            if (data.example_dataset) {
-                datasetInput.value = data.example_dataset;
-                validateDataset();
-                showSuccess('Multi-class example network and dataset loaded!');
-                // Update progress to step 2 (network + dataset loaded)
-                updateStep(2);
-            } else {
-                // Only network loaded
-                updateStep(1);
-            }
+            // Only network loaded, no dataset yet
+            showSuccess('Multi-class network (3-4-2) built! Go to Dataset tab and click "Load Example Dataset" to get matching data. Redirecting...');
+            updateStep(1);
+
+            // Redirect to dataset tab after 3 seconds
+            setTimeout(() => {
+                const datasetTab = document.getElementById('tab-dataset');
+                if (datasetTab) {
+                    datasetTab.checked = true;
+                    // Scroll to dataset section
+                    const datasetSection = document.getElementById('dataset');
+                    if (datasetSection) {
+                        datasetSection.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                    }
+                }
+            }, 3000);
         } else {
             showError('Error: ' + data.error);
         }
@@ -186,7 +225,7 @@ async function quickStartMultiClass() {
         showError('Error: ' + error.message);
     } finally {
         quickStartMultiClassBtn.disabled = false;
-        quickStartMultiClassBtn.innerHTML = '<i class="fas fa-layer-group"></i> Multi-Class (3-4-2 Softmax)';
+        quickStartMultiClassBtn.innerHTML = '<i class="fas fa-layer-group"></i> Multi-Class (3-4-2 Network)';
     }
 }
 
@@ -208,13 +247,22 @@ async function quickStartBinary() {
         const data = await response.json();
 
         if (data.success) {
-            networkSummary.textContent = data.summary;
+            // Format the network summary in a card with better styling
+            networkSummary.innerHTML = `
+                <div class="card bg-base-100 shadow-xl border-2 border-success">
+                    <div class="card-body">
+                        <h3 class="card-title text-success flex items-center gap-2">
+                            <i class="fas fa-check-circle"></i>
+                            Network Built Successfully!
+                        </h3>
+                        <pre class="bg-base-200 p-4 rounded-lg overflow-x-auto text-sm font-mono leading-relaxed whitespace-pre-wrap">${data.summary}</pre>
+                    </div>
+                </div>
+            `;
             networkSummary.classList.add('show');
 
             // Display classification info and auto-select loss
             displayClassificationInfo(data.classification_type, data.recommended_loss);
-
-            showSuccess(data.message);
 
             // Load the example network into the interactive builder
             if (data.layers && data.connections) {
@@ -224,17 +272,22 @@ async function quickStartBinary() {
             // Update dataset requirement display
             updateDatasetRequirement();
 
-            // Load example dataset from backend response
-            if (data.example_dataset) {
-                datasetInput.value = data.example_dataset;
-                validateDataset();
-                showSuccess('Binary example network and dataset loaded!');
-                // Update progress to step 2 (network + dataset loaded)
-                updateStep(2);
-            } else {
-                // Only network loaded
-                updateStep(1);
-            }
+            // Only network loaded, no dataset yet
+            showSuccess('Binary classification network (3-4-1) built! Go to Dataset tab and click "Load Example Dataset" to get matching data. Redirecting...');
+            updateStep(1);
+
+            // Redirect to dataset tab after 3 seconds
+            setTimeout(() => {
+                const datasetTab = document.getElementById('tab-dataset');
+                if (datasetTab) {
+                    datasetTab.checked = true;
+                    // Scroll to dataset section
+                    const datasetSection = document.getElementById('dataset');
+                    if (datasetSection) {
+                        datasetSection.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                    }
+                }
+            }, 3000);
         } else {
             showError('Error: ' + data.error);
         }
@@ -243,7 +296,7 @@ async function quickStartBinary() {
         showError('Error: ' + error.message);
     } finally {
         quickStartBinaryBtn.disabled = false;
-        quickStartBinaryBtn.innerHTML = '<i class="fas fa-circle-dot"></i> Binary Classification (3-4-1)';
+        quickStartBinaryBtn.innerHTML = '<i class="fas fa-circle-dot"></i> Binary (3-4-1 Network)';
     }
 }
 
@@ -412,7 +465,7 @@ function hideDatasetStats() {
     datasetStats.classList.remove('show');
 }
 
-// Load Example Dataset
+// Load Example Dataset (Educational)
 function loadExampleDataset() {
     // Get current network configuration
     if (!networkBuilder || !networkBuilder.layers || networkBuilder.layers.length < 2) {
@@ -423,23 +476,144 @@ function loadExampleDataset() {
     const inputNodes = networkBuilder.layers[0].nodes;
     const outputNodes = networkBuilder.layers[networkBuilder.layers.length - 1].nodes;
 
-    // Generate example dataset based on current network
+    // Generate column headers
     const inputCols = Array.from({length: inputNodes}, (_, i) => `x${i+1}`);
     const outputCols = Array.from({length: outputNodes}, (_, i) => `y${i+1}`);
     const headers = [...inputCols, ...outputCols].join(',');
 
-    // Generate 10 sample rows
     let rows = [headers];
-    for (let i = 0; i < 10; i++) {
-        const inputValues = Array.from({length: inputNodes}, () => Math.floor(Math.random() * 100));
-        const outputValues = Array.from({length: outputNodes}, () => Math.random() > 0.5 ? 1 : 0);
-        rows.push([...inputValues, ...outputValues].join(','));
+    let datasetName = '';
+    let description = '';
+
+    // Select appropriate educational dataset based on architecture
+    if (inputNodes === 2 && outputNodes === 1) {
+        // XOR Problem (Classic Neural Network Problem)
+        datasetName = 'XOR Logic Gate';
+        description = 'Classic XOR problem - perfect for learning neural networks!';
+        rows.push('0,0,0');
+        rows.push('0,1,1');
+        rows.push('1,0,1');
+        rows.push('1,1,0');
+
+    } else if (inputNodes === 2 && outputNodes === 2) {
+        // Multi-output classification
+        datasetName = 'Multi-Label Classification';
+        description = 'Dataset with multiple independent outputs';
+        rows.push('0,0,1,0');
+        rows.push('0,1,1,1');
+        rows.push('1,0,0,1');
+        rows.push('1,1,0,0');
+        rows.push('0.2,0.3,1,0');
+        rows.push('0.8,0.9,0,1');
+        rows.push('0.3,0.8,1,1');
+        rows.push('0.7,0.2,0,0');
+
+    } else if (inputNodes === 3 && outputNodes === 1) {
+        // 3-input logic problem
+        datasetName = '3-Input Logic Problem';
+        description = 'Learn pattern recognition with 3 inputs';
+        rows.push('0,0,0,0');
+        rows.push('0,0,1,0');
+        rows.push('0,1,0,0');
+        rows.push('0,1,1,1');
+        rows.push('1,0,0,0');
+        rows.push('1,0,1,1');
+        rows.push('1,1,0,1');
+        rows.push('1,1,1,1');
+
+    } else if (inputNodes === 3 && outputNodes === 2) {
+        // Multi-class classification (3 inputs, 2 outputs for classes)
+        datasetName = 'Multi-Class Classification';
+        description = '3-input classification into 2 classes';
+        // Class 0: [1,0]
+        rows.push('1,2,3,1,0');
+        rows.push('2,3,4,1,0');
+        rows.push('1,1,2,1,0');
+        rows.push('2,2,3,1,0');
+        rows.push('1,3,2,1,0');
+        // Class 1: [0,1]
+        rows.push('8,9,10,0,1');
+        rows.push('7,8,9,0,1');
+        rows.push('9,10,11,0,1');
+        rows.push('8,10,9,0,1');
+        rows.push('7,9,10,0,1');
+
+    } else if (inputNodes === 1 && outputNodes === 1) {
+        // Simple linear relationship
+        datasetName = 'Simple Linear Problem';
+        description = 'Basic input-output relationship';
+        rows.push('0,0');
+        rows.push('1,1');
+        rows.push('2,1');
+        rows.push('3,1');
+        rows.push('4,0');
+        rows.push('5,0');
+        rows.push('6,1');
+        rows.push('7,1');
+
+    } else {
+        // Generic dataset for any configuration
+        datasetName = 'Generic Pattern Dataset';
+        description = `Educational dataset for ${inputNodes} inputs and ${outputNodes} outputs`;
+
+        // Create a pattern-based dataset (not random)
+        for (let i = 0; i < 12; i++) {
+            const inputValues = [];
+            const outputValues = [];
+
+            // Create pattern-based inputs
+            for (let j = 0; j < inputNodes; j++) {
+                // Use patterns instead of random: 0, 0.5, 1 patterns
+                inputValues.push((i % 3) * 0.5 + (j * 0.1));
+            }
+
+            // Create pattern-based outputs
+            for (let j = 0; j < outputNodes; j++) {
+                // Output pattern based on sum of inputs
+                const sum = inputValues.reduce((a, b) => a + b, 0);
+                outputValues.push(sum > (inputNodes * 0.5) ? 1 : 0);
+            }
+
+            rows.push([...inputValues.map(v => v.toFixed(1)), ...outputValues].join(','));
+        }
     }
 
     const exampleData = rows.join('\n');
     datasetInput.value = exampleData;
     validateDataset();
-    showSuccess(`Example dataset loaded! (${inputNodes} inputs, ${outputNodes} outputs, 10 samples)`);
+
+    // Show detailed success message
+    showSuccess(`📚 ${datasetName} loaded! ${description} (${rows.length - 1} samples)`);
+}
+
+// Save Dataset and Continue to next step
+function saveDatasetAndContinue() {
+    // Validate dataset first
+    const validation = validateDataset();
+
+    if (!validation.valid) {
+        showError('Please fix dataset validation errors first or load example dataset');
+        return;
+    }
+
+    // Dataset is valid, show success
+    showSuccess('Dataset saved! Redirecting to Forward Pass...');
+
+    // Update progress to step 2
+    updateStep(2);
+
+    // Redirect to Forward Pass tab after 3 seconds
+    setTimeout(() => {
+        const forwardTab = document.getElementById('tab-forward');
+        if (forwardTab) {
+            forwardTab.checked = true;
+            // Scroll to forward pass section
+            const forwardSection = document.getElementById('forward');
+            if (forwardSection) {
+                forwardSection.scrollIntoView({ behavior: 'smooth', block: 'start' });
+            }
+        }
+    }, 3000);
 }
 
 // ============================
@@ -493,13 +667,13 @@ async function runForwardPass() {
             // Update progress to step 3
             updateStep(3);
 
-            // Switch to Loss tab after 2 seconds
+            // Switch to Loss tab after 3 seconds
             setTimeout(() => {
                 const lossTab = document.getElementById('tab-loss');
                 if (lossTab) {
                     lossTab.checked = true;
                 }
-            }, 2000);
+            }, 3000);
         } else {
             showError('Error: ' + data.error);
         }
@@ -656,13 +830,13 @@ async function calculateLoss() {
             // Update progress to step 4
             updateStep(4);
 
-            // Switch to Epoch Summary tab after 2 seconds
+            // Switch to Epoch Summary tab after 3 seconds
             setTimeout(() => {
                 const epochTab = document.getElementById('tab-epoch');
                 if (epochTab) {
                     epochTab.checked = true;
                 }
-            }, 2000);
+            }, 3000);
         } else {
             showError('Error calculating loss: ' + data.error);
         }
@@ -978,23 +1152,18 @@ async function run1Epoch() {
         if (data.success) {
             // Display epoch summary
             displayEpochSummary(data);
-            showSuccess('✅ 1 Epoch Completed! See full training cycle summary.');
+            showSuccess('✅ 1 Epoch Completed! See full training cycle summary below.');
 
             // Update progress to step 5
             updateStep(5);
 
-            // Switch to Epoch Summary tab after 1.5 seconds
-            setTimeout(() => {
-                const epochTab = document.getElementById('tab-epoch');
-                if (epochTab) {
-                    epochTab.checked = true;
-                    // Scroll to epoch summary
-                    const epochContainer = document.getElementById('epochSummaryContainer');
-                    if (epochContainer) {
-                        epochContainer.scrollIntoView({ behavior: 'smooth', block: 'start' });
-                    }
-                }
-            }, 1500);
+            // Scroll to epoch summary immediately (no tab switch, user already on Epoch Summary tab)
+            const epochContainer = document.getElementById('epochSummaryContainer');
+            if (epochContainer) {
+                setTimeout(() => {
+                    epochContainer.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                }, 500);
+            }
         } else {
             showError('Error during 1 epoch: ' + data.error);
         }
@@ -1384,7 +1553,7 @@ async function startTraining() {
             // Update progress to step 6
             updateStep(6);
 
-            // Automatically switch to Results tab after 1 second
+            // Automatically switch to Results tab after 3 seconds
             setTimeout(() => {
                 const resultsTab = document.getElementById('tab-results');
                 if (resultsTab) {
@@ -1399,7 +1568,7 @@ async function startTraining() {
                         }
                     }, 300);
                 }
-            }, 1000);
+            }, 3000);
         } else {
             showError('Error during training: ' + data.error);
             if (data.traceback) {

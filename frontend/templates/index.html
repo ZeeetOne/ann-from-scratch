@@ -41,17 +41,21 @@
                             <div class="flex flex-wrap gap-3 mt-4">
                                 <button id="quickStartBinaryBtn" class="btn btn-primary gap-2 shadow-md hover:shadow-lg">
                                     <i class="fas fa-circle-dot"></i>
-                                    Binary Classification (3-4-1)
+                                    Binary (3-4-1 Network)
                                 </button>
                                 <button id="quickStartMultiClassBtn" class="btn btn-secondary gap-2 shadow-md hover:shadow-lg">
                                     <i class="fas fa-layer-group"></i>
-                                    Multi-Class (3-4-2 Softmax)
+                                    Multi-Class (3-4-2 Network)
                                 </button>
                                 <button id="resetNetworkBtn" class="btn btn-warning gap-2 shadow-md hover:shadow-lg">
                                     <i class="fas fa-rotate-right"></i>
                                     Reset to 1-1-1
                                 </button>
                             </div>
+                            <p class="text-sm text-base-content/70 mt-2">
+                                <i class="fas fa-info-circle mr-1"></i>
+                                Quick Start builds network architecture only. Click "Load Example Dataset" in the Dataset tab to get matching educational data.
+                            </p>
                         </div>
                     </div>
 
@@ -275,13 +279,17 @@
 
                     <div class="flex gap-3">
                         <button id="loadExampleBtn" class="btn btn-primary gap-2">
-                            <i class="fas fa-file-import"></i>
-                            Load Example Dataset
+                            <i class="fas fa-book"></i>
+                            Load Example Dataset (Educational)
                         </button>
-                        <button id="generateRandomBtn" class="btn btn-secondary gap-2">
-                            <i class="fas fa-dice"></i>
-                            Generate Random Dataset
-                        </button>
+                    </div>
+
+                    <div class="alert alert-info mb-4">
+                        <i class="fas fa-lightbulb"></i>
+                        <div>
+                            <p class="font-semibold">Example Dataset:</p>
+                            <p class="text-sm">Loads pre-configured educational dataset that matches your network architecture (XOR, AND, OR, Classification problems, etc.)</p>
+                        </div>
                     </div>
 
                     <div id="dropZone" class="card bg-base-200 border-2 border-dashed border-base-300 hover:border-primary hover:bg-primary/5 cursor-pointer transition-all">
@@ -304,6 +312,13 @@
                             <textarea id="datasetInput" class="textarea textarea-bordered h-64 font-mono text-sm"
                                       placeholder="x1,x2,x3,y1,y2&#10;25,1010,85,1,0&#10;30,1015,45,0,1"></textarea>
                             <div id="datasetStats" class="stats stats-vertical lg:stats-horizontal shadow mt-4"></div>
+
+                            <div class="card-actions justify-end mt-6">
+                                <button id="saveDatasetBtn" class="btn btn-success btn-lg gap-2">
+                                    <i class="fas fa-check-circle"></i>
+                                    Save Dataset & Continue
+                                </button>
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -564,18 +579,12 @@
                             <div class="chart-container">
                                 <canvas id="lossChart"></canvas>
                             </div>
-                        </div>
-                    </div>
-
-                    <!-- Accuracy Chart -->
-                    <div class="card bg-base-100 shadow-xl">
-                        <div class="card-body">
-                            <h3 class="card-title">
-                                <i class="fas fa-chart-area text-green-600"></i>
-                                Accuracy Progress
-                            </h3>
-                            <div class="chart-container">
-                                <canvas id="accuracyChart"></canvas>
+                            <div class="alert alert-info mt-4">
+                                <i class="fas fa-info-circle"></i>
+                                <div>
+                                    <p class="font-semibold">Understanding Loss Curve:</p>
+                                    <p class="text-sm">Loss should decrease over epochs as the network learns. If loss is not decreasing, try adjusting the learning rate or network architecture.</p>
+                                </div>
                             </div>
                         </div>
                     </div>

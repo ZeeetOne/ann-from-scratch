@@ -128,9 +128,8 @@
         }
     }
 
-    // Initialize Charts
+    // Initialize Loss Chart
     let lossChart = null;
-    let accuracyChart = null;
 
     function initializeLossChart() {
         const ctx = document.getElementById('lossChart');
@@ -181,79 +180,28 @@
         });
     }
 
-    function initializeAccuracyChart() {
-        const ctx = document.getElementById('accuracyChart');
-        if (!ctx) return;
 
-        if (accuracyChart) {
-            accuracyChart.destroy();
-        }
-
-        accuracyChart = new Chart(ctx, {
-            type: 'line',
-            data: {
-                labels: [],
-                datasets: [{
-                    label: 'Accuracy',
-                    data: [],
-                    borderColor: 'rgb(34, 197, 94)',
-                    backgroundColor: 'rgba(34, 197, 94, 0.1)',
-                    tension: 0.4,
-                    fill: true
-                }]
-            },
-            options: {
-                responsive: true,
-                maintainAspectRatio: false,
-                plugins: {
-                    legend: {
-                        display: true,
-                        position: 'top'
-                    }
-                },
-                scales: {
-                    y: {
-                        beginAtZero: true,
-                        max: 100,
-                        title: {
-                            display: true,
-                            text: 'Accuracy (%)'
-                        }
-                    },
-                    x: {
-                        title: {
-                            display: true,
-                            text: 'Epoch'
-                        }
-                    }
-                }
-            }
-        });
-    }
-
-    // Initialize charts on page load
+    // Initialize loss chart on page load
     document.addEventListener('DOMContentLoaded', () => {
-        console.log('Initializing charts...');
+        console.log('Initializing loss chart...');
         initializeLossChart();
-        initializeAccuracyChart();
 
-        // Re-initialize charts when Results tab is opened
+        // Re-initialize chart when Results tab is opened
         const resultsTab = document.getElementById('tab-results');
         if (resultsTab) {
             resultsTab.addEventListener('change', () => {
                 if (resultsTab.checked) {
-                    console.log('Results tab opened, re-rendering charts...');
+                    console.log('Results tab opened, re-rendering chart...');
                     // Small delay to ensure container is visible
                     setTimeout(() => {
                         if (lossChart) lossChart.resize();
-                        if (accuracyChart) accuracyChart.resize();
                     }, 100);
                 }
             });
         }
     });
 
-    // Helper function to update charts
+    // Helper function to update loss chart
     function updateCharts(history) {
         console.log('updateCharts called with history:', history);
 
@@ -272,62 +220,11 @@
         } else {
             console.warn('lossChart not initialized');
         }
-
-        // Update accuracy chart if accuracy data exists
-        if (accuracyChart) {
-            if (history.accuracy && history.accuracy.length > 0) {
-                const epochs = history.accuracy.map((_, i) => i + 1);
-                accuracyChart.data.labels = epochs;
-                accuracyChart.data.datasets[0].data = history.accuracy.map(acc => acc * 100);
-                accuracyChart.update();
-                console.log('Accuracy chart updated with', history.accuracy.length, 'data points');
-            } else {
-                // Show message if no accuracy data
-                console.warn('No accuracy data in history');
-                const accuracyCard = document.querySelector('#accuracyChart').closest('.card');
-                if (accuracyCard) {
-                    const alertDiv = document.createElement('div');
-                    alertDiv.className = 'alert alert-info mt-4';
-                    alertDiv.innerHTML = `
-                        <i class="fas fa-info-circle"></i>
-                        <span>Accuracy data not available. This may be expected for regression tasks or if accuracy wasn't calculated during training.</span>
-                    `;
-                    // Check if alert doesn't exist already
-                    if (!accuracyCard.querySelector('.alert')) {
-                        accuracyCard.querySelector('.card-body').appendChild(alertDiv);
-                    }
-                }
-            }
-        } else {
-            console.warn('accuracyChart not initialized');
-        }
     }
 
-    // Generate Random Dataset Button
-    const generateRandomBtn = document.getElementById('generateRandomBtn');
-    if (generateRandomBtn) {
-        generateRandomBtn.addEventListener('click', async () => {
-            const numSamples = prompt('Enter number of samples (10-100):', '20');
-            if (!numSamples) return;
-
-            try {
-                const response = await fetch('/generate_random_dataset', {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ num_samples: parseInt(numSamples) })
-                });
-
-                const data = await response.json();
-                if (data.success) {
-                    document.getElementById('datasetInput').value = data.dataset;
-                    showToast('Random dataset generated successfully!', 'success');
-                    updateStep(2);
-                }
-            } catch (error) {
-                showToast('Error generating dataset', 'error');
-            }
-        });
-    }
+    // Note: Generate Random Dataset button removed to avoid confusion
+    // Users can use "Load Example Dataset" for educational datasets
+    // or upload their own CSV files
 </script>
 
 <script src="{{ url_for('static', filename='js/network-builder.js') }}"></script>
