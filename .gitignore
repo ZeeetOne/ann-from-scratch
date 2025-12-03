@@ -48,3 +48,11 @@ htmlcov/
 .env
 .venv
 nul
+
+# Node.js
+node_modules/
+package-lock.json
+
+# Build output
+frontend/static/css/dist/
+.cache/

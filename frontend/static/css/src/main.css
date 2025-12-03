@@ -1,0 +1,29 @@
+/* ====================================
+   ANN from Scratch - Main Stylesheet
+   Modern CSS with PostCSS build system
+   ==================================== */
+
+/* Base styles */
+@import 'base/variables.css';
+@import 'base/reset.css';
+@import 'base/layout.css';
+@import 'base/utilities.css';
+
+/* Components */
+@import 'components/network-canvas.css';
+
+/* Features - all app-specific visualization styles */
+@import 'features/app-features.css';
+
+/* Gradient text utility */
+.gradient-text {
+    background: var(--primary-gradient);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+}
+
+/* Hero gradient class */
+.hero-gradient {
+    background: var(--primary-gradient);
+}

@@ -1,0 +1,28 @@
+/* CSS Custom Properties for theming */
+:root {
+  /* Primary gradient */
+  --primary-gradient: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+
+  /* Network canvas colors */
+  --network-bg-light: #f8f9fa;
+  --network-bg-dark: #1f2937;
+  --network-border-light: #dee2e6;
+  --network-border-dark: #374151;
+
+  /* Node colors */
+  --node-input: #4caf50;
+  --node-input-border: #2e7d32;
+  --node-hidden: #2196f3;
+  --node-hidden-border: #1565c0;
+  --node-output: #ff9800;
+  --node-output-border: #e65100;
+
+  /* Connection colors */
+  --connection-color: #667eea;
+  --connection-hover: #764ba2;
+
+  /* Status colors */
+  --status-success: #28a745;
+  --status-error: #dc3545;
+  --status-warning: #ffc107;
+}

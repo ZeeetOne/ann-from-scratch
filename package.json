@@ -1,0 +1,26 @@
+{
+  "name": "ann-from-scratch",
+  "version": "1.0.0",
+  "description": "Professional neural network framework built from scratch with interactive web interface",
+  "scripts": {
+    "build:css": "postcss frontend/static/css/src/main.css -o frontend/static/css/dist/style.css",
+    "watch:css": "postcss frontend/static/css/src/main.css -o frontend/static/css/dist/style.css --watch",
+    "build": "npm run build:css"
+  },
+  "keywords": [
+    "neural-network",
+    "machine-learning",
+    "deep-learning",
+    "python",
+    "flask"
+  ],
+  "author": "",
+  "license": "MIT",
+  "devDependencies": {
+    "postcss": "^8.4.32",
+    "postcss-cli": "^11.0.0",
+    "postcss-import": "^16.0.0",
+    "autoprefixer": "^10.4.16",
+    "cssnano": "^6.0.2"
+  }
+}

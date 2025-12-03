@@ -1,59 +1,79 @@
 // ANN from Scratch - Frontend JavaScript
+// ES6 Module Version
 
-// DOM Elements
-const buildNetworkBtn = document.getElementById('buildNetworkBtn');
-const networkSummary = document.getElementById('networkSummary');
-const quickStartMultiClassBtn = document.getElementById('quickStartMultiClassBtn');
-const quickStartBinaryBtn = document.getElementById('quickStartBinaryBtn');
-const loadExampleBtn = document.getElementById('loadExampleBtn');
-const datasetInput = document.getElementById('datasetInput');
-const forwardPassBtn = document.getElementById('forwardPassBtn');
-const forwardPassContainer = document.getElementById('forwardPassContainer');
-const forwardPassSummary = document.getElementById('forwardPassSummary');
-// const resultsContainer = document.getElementById('resultsContainer');  // Removed section
-// const metricsContainer = document.getElementById('metricsContainer');  // Removed section
-const trainBtn = document.getElementById('trainBtn');
-const trainingResults = document.getElementById('trainingResults');
-const trainingProgress = document.getElementById('trainingProgress');
-const evaluationResults = document.getElementById('evaluationResults');
-const evaluationResultsSection = document.getElementById('evaluationResultsSection');
-const dropZone = document.getElementById('dropZone');
-const fileInput = document.getElementById('fileInput');
-const datasetValidation = document.getElementById('datasetValidation');
-const datasetStats = document.getElementById('datasetStats');
-const datasetRequirement = document.getElementById('datasetRequirement');
-const calculateLossBtn = document.getElementById('calculateLossBtn');
-const lossFunctionSelect = document.getElementById('lossFunctionSelect');
-const lossContainer = document.getElementById('lossContainer');
-// const backpropBtn = document.getElementById('backpropBtn');  // Removed section
-// const backpropContainer = document.getElementById('backpropContainer');  // Removed section
-const updateWeightsBtn = document.getElementById('updateWeightsBtn');
-const updateWeightsContainer = document.getElementById('updateWeightsContainer');
+// Import utilities and modules
+import { api } from './utils/api-client.js';
+import { formatNumber, formatPercentage, formatArray } from './utils/formatters.js';
+import { ACTIVATION_FUNCTIONS, LOSS_FUNCTIONS, OPTIMIZERS, CHART_COLORS } from './config/constants.js';
+import { InteractiveNetworkBuilder } from './modules/network/network-builder.js';
 
-// Event Listeners
-buildNetworkBtn.addEventListener('click', buildNetwork);
-quickStartMultiClassBtn.addEventListener('click', quickStartMultiClass);
-quickStartBinaryBtn.addEventListener('click', quickStartBinary);
-loadExampleBtn.addEventListener('click', loadExampleDataset);
-document.getElementById('saveDatasetBtn').addEventListener('click', saveDatasetAndContinue);
-forwardPassBtn.addEventListener('click', runForwardPass);
-calculateLossBtn.addEventListener('click', calculateLoss);
-// backpropBtn.addEventListener('click', runBackpropagation);  // Removed section
-if (updateWeightsBtn) {
-    updateWeightsBtn.addEventListener('click', updateWeights);
-}
-document.getElementById('run1EpochBtn').addEventListener('click', run1Epoch);
-trainBtn.addEventListener('click', startTraining);
+// Global network builder instance (initialized after DOM loads)
+let networkBuilder = null;
 
-// Dataset drag & drop
-dropZone.addEventListener('click', () => fileInput.click());
-fileInput.addEventListener('change', handleFileSelect);
-dropZone.addEventListener('dragover', handleDragOver);
-dropZone.addEventListener('dragleave', handleDragLeave);
-dropZone.addEventListener('drop', handleDrop);
+// DOM Elements (will be initialized when DOM is ready)
+let buildNetworkBtn, networkSummary, quickStartMultiClassBtn, quickStartBinaryBtn;
+let loadExampleBtn, datasetInput, forwardPassBtn, forwardPassContainer, forwardPassSummary;
+let trainBtn, trainingResults, trainingProgress, evaluationResults, evaluationResultsSection;
+let dropZone, fileInput, datasetValidation, datasetStats, datasetRequirement;
+let calculateLossBtn, lossFunctionSelect, lossContainer;
+let updateWeightsBtn, updateWeightsContainer;
 
-// Validate dataset when it changes
-datasetInput.addEventListener('input', validateDataset);
+// Initialize when DOM is ready
+document.addEventListener('DOMContentLoaded', () => {
+    // Initialize DOM elements
+    buildNetworkBtn = document.getElementById('buildNetworkBtn');
+    networkSummary = document.getElementById('networkSummary');
+    quickStartMultiClassBtn = document.getElementById('quickStartMultiClassBtn');
+    quickStartBinaryBtn = document.getElementById('quickStartBinaryBtn');
+    loadExampleBtn = document.getElementById('loadExampleBtn');
+    datasetInput = document.getElementById('datasetInput');
+    forwardPassBtn = document.getElementById('forwardPassBtn');
+    forwardPassContainer = document.getElementById('forwardPassContainer');
+    forwardPassSummary = document.getElementById('forwardPassSummary');
+    trainBtn = document.getElementById('trainBtn');
+    trainingResults = document.getElementById('trainingResults');
+    trainingProgress = document.getElementById('trainingProgress');
+    evaluationResults = document.getElementById('evaluationResults');
+    evaluationResultsSection = document.getElementById('evaluationResultsSection');
+    dropZone = document.getElementById('dropZone');
+    fileInput = document.getElementById('fileInput');
+    datasetValidation = document.getElementById('datasetValidation');
+    datasetStats = document.getElementById('datasetStats');
+    datasetRequirement = document.getElementById('datasetRequirement');
+    calculateLossBtn = document.getElementById('calculateLossBtn');
+    lossFunctionSelect = document.getElementById('lossFunctionSelect');
+    lossContainer = document.getElementById('lossContainer');
+    updateWeightsBtn = document.getElementById('updateWeightsBtn');
+    updateWeightsContainer = document.getElementById('updateWeightsContainer');
+
+    // Initialize network builder
+    networkBuilder = new InteractiveNetworkBuilder('networkCanvas');
+    console.log('Network builder initialized');
+
+    // Event Listeners
+    buildNetworkBtn.addEventListener('click', buildNetwork);
+    quickStartMultiClassBtn.addEventListener('click', quickStartMultiClass);
+    quickStartBinaryBtn.addEventListener('click', quickStartBinary);
+    loadExampleBtn.addEventListener('click', loadExampleDataset);
+    document.getElementById('saveDatasetBtn').addEventListener('click', saveDatasetAndContinue);
+    forwardPassBtn.addEventListener('click', runForwardPass);
+    calculateLossBtn.addEventListener('click', calculateLoss);
+    if (updateWeightsBtn) {
+        updateWeightsBtn.addEventListener('click', updateWeights);
+    }
+    document.getElementById('run1EpochBtn').addEventListener('click', run1Epoch);
+    trainBtn.addEventListener('click', startTraining);
+
+    // Dataset drag & drop
+    dropZone.addEventListener('click', () => fileInput.click());
+    fileInput.addEventListener('change', handleFileSelect);
+    dropZone.addEventListener('dragover', handleDragOver);
+    dropZone.addEventListener('dragleave', handleDragLeave);
+    dropZone.addEventListener('drop', handleDrop);
+
+    // Validate dataset when it changes
+    datasetInput.addEventListener('input', validateDataset);
+});
 
 // ============================
 // Old UI Functions (Removed)
